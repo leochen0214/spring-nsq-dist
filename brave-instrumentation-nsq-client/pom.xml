@@ -11,5 +11,17 @@
 
     <artifactId>brave-instrumentation-nsq-client</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>io.zipkin.brave</groupId>
+            <artifactId>brave</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.youzan</groupId>
+            <artifactId>NSQ-Client</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
 
 </project>
