@@ -12,6 +12,7 @@
     <modules>
         <module>spring-nsq</module>
         <module>brave-instrumentation-nsq-client</module>
+        <module>nsq-spring-boot-starter</module>
         <module>test</module>
     </modules>
 
