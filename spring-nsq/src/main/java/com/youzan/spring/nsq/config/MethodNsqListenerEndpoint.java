@@ -36,7 +36,6 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
   private Boolean ordered;
   private Boolean autoFinish;
   private String group;
-  private Integer concurrency;
 
   private Object bean;
   private Method method;
@@ -104,15 +103,6 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
 
   public void setGroup(String group) {
     this.group = group;
-  }
-
-  @Override
-  public Integer getConcurrency() {
-    return concurrency;
-  }
-
-  public void setConcurrency(Integer concurrency) {
-    this.concurrency = concurrency;
   }
 
   @Override
@@ -210,7 +200,6 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
   @Override
   public void setupListenerContainer(MessageListenerContainer listenerContainer,
                                      NSQMessageConverter messageConverter) {
-
     setupMessageListener(listenerContainer, messageConverter);
   }
 

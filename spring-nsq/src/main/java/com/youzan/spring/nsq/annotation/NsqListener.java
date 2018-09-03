@@ -34,8 +34,7 @@ import java.lang.annotation.Target;
  * <li>{@link org.springframework.messaging.handler.annotation.Payload @Payload}-annotated
  * method arguments including the support of validation</li>
  * <li>{@link org.springframework.messaging.handler.annotation.Header @Header}-annotated
- * method arguments to extract a specific header value, defined by {@link
- * org.springframework.Nsq.support.NsqHeaders NsqHeaders}</li>
+ * method arguments to extract a specific header value</li>
  * <li>{@link org.springframework.messaging.handler.annotation.Headers @Headers}-annotated
  * argument that must also be assignable to {@link java.util.Map} for getting access to all
  * headers.</li>
@@ -47,8 +46,8 @@ import java.lang.annotation.Target;
  *
  * <p>When defined at the method level, a listener container is created for each method.
  * The {@link com.youzan.spring.nsq.listener.MessageListener} is a {@link
- * org.springframework.Nsq.listener.adapter.MessagingMessageListenerAdapter}, configured with a
- * {@link com.youzan.spring.nsq.config.MethodNsqListenerEndpoint}.
+ * com.youzan.spring.nsq.listener.adapter.MessagingMessageListenerAdapter}, configured with a {@link
+ * com.youzan.spring.nsq.config.MethodNsqListenerEndpoint}.
  *
  * @author: clong
  * @date: 2018-08-29
@@ -70,8 +69,8 @@ public @interface NsqListener {
   String id() default "";
 
   /**
-   * The bean name of the {@link MessageListenerContainerFactory} to use to
-   * create the message listener container responsible to serve this endpoint.
+   * The bean name of the {@link MessageListenerContainerFactory} to use to create the message
+   * listener container responsible to serve this endpoint.
    * <p>If not specified, the default container factory is used, if any.
    *
    * @return the container factory bean name.
@@ -87,8 +86,9 @@ public @interface NsqListener {
   String[] topics() default {};
 
   /**
-   * the getChannel name for this listener. The entries can be 'getChannel name', 'property-placeholder
-   * keys' or 'expressions'. Expression must be resolved to the getChannel name.
+   * the getChannel name for this listener. The entries can be 'getChannel name',
+   * 'property-placeholder keys' or 'expressions'. Expression must be resolved to the getChannel
+   * name.
    *
    * @return the getChannel name or expressions (SpEL) to listen to.
    */

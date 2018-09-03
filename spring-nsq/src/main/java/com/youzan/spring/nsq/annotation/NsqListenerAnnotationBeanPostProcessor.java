@@ -44,8 +44,7 @@ import static com.youzan.spring.nsq.config.NsqConfigConstants.DEFAULT_NSQ_LISTEN
 /**
  * Bean post-processor that registers methods annotated with {@link NsqListener} to be invoked by a
  * nsq message listener container created under the covers by a {@link
- * MessageListenerContainerFactory} according to the parameters of the
- * annotation.
+ * MessageListenerContainerFactory} according to the parameters of the annotation.
  *
  * <p>Annotated methods can use flexible arguments as defined by {@link NsqListener}.
  *
@@ -75,22 +74,16 @@ public class NsqListenerAnnotationBeanPostProcessor implements BeanPostProcessor
 
   private static final String GENERATED_ID_PREFIX = "NsqListenerEndpointContainer#";
 
-
   private final Set<Class<?>> nonAnnotatedClasses =
       Collections.newSetFromMap(new ConcurrentHashMap<>(64));
-
-  private NsqListenerEndpointRegistry endpointRegistry;
-
-  private String containerFactoryBeanName = DEFAULT_NSQ_LISTENER_CONTAINER_FACTORY_BEAN_NAME;
-
-  private BeanFactory beanFactory;
-
-  private MessageHandlerMethodFactory messageHandlerMethodFactory = new DefaultMessageHandlerMethodFactory();
-
   private final NsqListenerEndpointRegistrar registrar = new NsqListenerEndpointRegistrar();
-
   private final AtomicInteger counter = new AtomicInteger();
 
+  private NsqListenerEndpointRegistry endpointRegistry;
+  private String containerFactoryBeanName = DEFAULT_NSQ_LISTENER_CONTAINER_FACTORY_BEAN_NAME;
+  private BeanFactory beanFactory;
+  private NsqMessageHandlerMethodFactoryAdapter messageHandlerMethodFactory =
+      new NsqMessageHandlerMethodFactoryAdapter();
   private ExpressionResolver resolver;
 
 
@@ -114,7 +107,7 @@ public class NsqListenerAnnotationBeanPostProcessor implements BeanPostProcessor
    * @param factory the {@link MessageHandlerMethodFactory} instance.
    */
   public void setMessageHandlerMethodFactory(MessageHandlerMethodFactory factory) {
-    this.messageHandlerMethodFactory = factory;
+    this.messageHandlerMethodFactory.setMessageHandlerMethodFactory(factory);
   }
 
 
@@ -229,48 +222,46 @@ public class NsqListenerAnnotationBeanPostProcessor implements BeanPostProcessor
     return listeners;
   }
 
-  protected void processListener(NsqListener listener, Method method, Object bean, String beanName) {
-    Method methodToUse = checkProxy(method, bean);
+  protected void processListener(NsqListener listener, Method method, Object bean,
+                                 String beanName) {
+    Method m = checkProxy(method, bean);
     MethodNsqListenerEndpoint endpoint = new MethodNsqListenerEndpoint();
     endpoint.setId(getEndpointId(listener));
     endpoint.setTopics(resolveTopics(listener));
     endpoint.setChannel(resolver.resolveExpressionAsString(listener.channel(), "channel"));
-    endpoint.setAutoStartup(resolver.resolveExpressionAsBoolean(listener.autoStartup(), "autoStartup"));
+    endpoint
+        .setAutoStartup(resolver.resolveExpressionAsBoolean(listener.autoStartup(), "autoStartup"));
     endpoint.setOrdered(listener.ordered());
     endpoint.setAutoFinish(listener.autoFinish());
     setGroup(endpoint, listener);
-    setConcurrency(endpoint, listener);
-
     endpoint.setBean(bean);
-    endpoint.setMethod(methodToUse);
+    endpoint.setMethod(m);
     endpoint.setBeanFactory(beanFactory);
     endpoint.setErrorHandler(getErrorHandler(listener));
-    endpoint.setMessageHandlerMethodFactory(messageHandlerMethodFactory);
+    this.messageHandlerMethodFactory.setBeanFactory(beanFactory);
+    endpoint.setMessageHandlerMethodFactory(this.messageHandlerMethodFactory);
 
-    MessageListenerContainerFactory<?> f =
-        getNsqListenerContainerFactory(listener, beanName, methodToUse);
-
+    MessageListenerContainerFactory<?> f = getListenerContainerFactory(listener, beanName, m);
     this.registrar.registerEndpoint(endpoint, f);
   }
 
-  private MessageListenerContainerFactory<?> getNsqListenerContainerFactory(NsqListener listener,
-                                                                            String beanName,
-                                                                            Method methodToUse) {
-    MessageListenerContainerFactory<?> messageListenerContainerFactory = null;
+  private MessageListenerContainerFactory<?> getListenerContainerFactory(NsqListener listener,
+                                                                         String beanName,
+                                                                         Method methodToUse) {
     String containerFactoryBeanName = resolver.resolve(listener.containerFactory());
     if (StringUtils.hasText(containerFactoryBeanName)) {
       try {
-        messageListenerContainerFactory =
-            beanFactory.getBean(containerFactoryBeanName, MessageListenerContainerFactory.class);
+        return beanFactory.getBean(containerFactoryBeanName, MessageListenerContainerFactory.class);
       } catch (NoSuchBeanDefinitionException ex) {
         throw new BeanInitializationException(
             "Could not register nsq listener endpoint on [" + methodToUse
-            + "] for bean " + beanName + ", no " + MessageListenerContainerFactory.class.getSimpleName()
+            + "] for bean " + beanName + ", no " + MessageListenerContainerFactory.class
+                .getSimpleName()
             + " with id '" + containerFactoryBeanName + "' was found in the application context",
             ex);
       }
     }
-    return messageListenerContainerFactory;
+    return null;
   }
 
   private NsqListenerErrorHandler getErrorHandler(NsqListener listener) {
@@ -284,13 +275,6 @@ public class NsqListenerAnnotationBeanPostProcessor implements BeanPostProcessor
     return null;
   }
 
-
-  private void setConcurrency(MethodNsqListenerEndpoint endpoint, NsqListener nsqListener) {
-    String concurrency = nsqListener.concurrency();
-    if (StringUtils.hasText(concurrency)) {
-      endpoint.setConcurrency(resolver.resolveExpressionAsInteger(concurrency, "concurrency"));
-    }
-  }
 
   private void setGroup(MethodNsqListenerEndpoint endpoint, NsqListener nsqListener) {
     String group = nsqListener.containerGroup();
@@ -314,9 +298,10 @@ public class NsqListenerAnnotationBeanPostProcessor implements BeanPostProcessor
   private String[] resolveTopics(NsqListener listener) {
     String[] topics = listener.topics();
     List<String> result = new ArrayList<>();
+
     if (topics.length > 0) {
-      for (int i = 0; i < topics.length; i++) {
-        Object topic = resolver.resolveExpression(topics[i]);
+      for (String topic1 : topics) {
+        Object topic = resolver.resolveExpression(topic1);
         resolver.resolveAsString(topic, result);
       }
     }

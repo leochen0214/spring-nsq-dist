@@ -8,6 +8,7 @@ import com.youzan.spring.nsq.support.converter.NSQMessageConverter;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.util.StringUtils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,9 +25,6 @@ public class NsqMessageListenerContainerFactory
     implements MessageListenerContainerFactory<NsqMessageListenerContainer>,
                ApplicationEventPublisherAware {
 
-
-  private final ConsumerConfigProperties containerProperties = new ConsumerConfigProperties();
-
   private ErrorHandler errorHandler;
 
   private ConsumerFactory consumerFactory;
@@ -41,20 +39,11 @@ public class NsqMessageListenerContainerFactory
 
   @Override
   public NsqMessageListenerContainer createListenerContainer(NsqListenerEndpoint endpoint) {
-
-    containerProperties.setTopics(endpoint.getTopics());
-    containerProperties.setChannel(endpoint.getChannel());
-    containerProperties.setOrdered(endpoint.ordered());
-    containerProperties.setAutoFinish(endpoint.autoFinish());
-
-
     NsqMessageListenerContainer instance = createContainerInstance(endpoint);
-
-    if (endpoint.getId() != null) {
+    if (StringUtils.hasText(endpoint.getId())) {
       instance.setBeanName(endpoint.getId());
     }
     endpoint.setupListenerContainer(instance, this.messageConverter);
-
     initializeContainer(instance, endpoint);
 
     return instance;
@@ -73,7 +62,13 @@ public class NsqMessageListenerContainerFactory
   }
 
   protected NsqMessageListenerContainer createContainerInstance(NsqListenerEndpoint endpoint) {
-    return new NsqMessageListenerContainer(consumerFactory, containerProperties);
+    ConsumerConfigProperties properties = new ConsumerConfigProperties();
+    properties.setTopics(endpoint.getTopics());
+    properties.setChannel(endpoint.getChannel());
+    properties.setOrdered(endpoint.ordered());
+    properties.setAutoFinish(endpoint.autoFinish());
+
+    return new NsqMessageListenerContainer(consumerFactory, properties);
   }
 
 
@@ -90,14 +85,17 @@ public class NsqMessageListenerContainerFactory
     if (this.errorHandler != null) {
       instance.setErrorHandler(this.errorHandler);
     }
+
     if (endpoint.getAutoStartup() != null) {
       instance.setAutoStartup(endpoint.getAutoStartup());
     } else if (this.autoStartup != null) {
       instance.setAutoStartup(this.autoStartup);
     }
+
     if (this.phase != null) {
       instance.setPhase(this.phase);
     }
+
     if (this.applicationEventPublisher != null) {
       instance.setApplicationEventPublisher(this.applicationEventPublisher);
     }

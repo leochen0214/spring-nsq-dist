@@ -6,7 +6,6 @@ import com.youzan.spring.nsq.exception.ListenerExecutionFailedException;
 import com.youzan.spring.nsq.listener.MessageListener;
 import com.youzan.spring.nsq.support.converter.MessagingMessageConverter;
 import com.youzan.spring.nsq.support.converter.NSQMessageConverter;
-import com.youzan.spring.nsq.support.util.NsqUtils;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.messaging.Message;
@@ -34,26 +33,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MessagingMessageListenerAdapter {
 
-
   private final Object bean;
-
-
   private final Type inferredType;
 
   private InvocableHandlerMethod handlerMethod;
-
   private boolean isConsumerRecordList;
-
   private boolean isConsumerRecords;
-
   private boolean isMessageList;
-
   private NSQMessageConverter messageConverter = new MessagingMessageConverter();
-
   private Type fallbackType = Object.class;
-
-
-  private boolean messageReturnType;
 
   public MessagingMessageListenerAdapter(Object bean, Method method) {
     this.bean = bean;
@@ -111,19 +99,6 @@ public class MessagingMessageListenerAdapter {
     this.handlerMethod = handlerMethod;
   }
 
-  protected boolean isConsumerRecordList() {
-    return this.isConsumerRecordList;
-  }
-
-  public boolean isConsumerRecords() {
-    return this.isConsumerRecords;
-  }
-
-
-  protected boolean isMessageList() {
-    return this.isMessageList;
-  }
-
 
   protected Message<?> toMessagingMessage(NSQMessage record, Consumer consumer) {
     return getMessageConverter().toSpringMessage(record, consumer, getType());
@@ -154,7 +129,8 @@ public class MessagingMessageListenerAdapter {
     } catch (MessagingException ex) {
       throw new ListenerExecutionFailedException(
           createMessagingErrorMessage("Listener method could not " +
-                                      "be invoked with the incoming message", message.getPayload()), ex);
+                                      "be invoked with the incoming message", message.getPayload()),
+          ex);
     } catch (Exception ex) {
       throw new ListenerExecutionFailedException("Listener method '" +
                                                  this.handlerMethod.getMethod().toGenericString()
@@ -262,7 +238,7 @@ public class MessagingMessageListenerAdapter {
       Assert.state(!this.isMessageList,
                    () -> String.format(stateMessage, "List<Message<?>>"));
     }
-    this.messageReturnType = NsqUtils.returnTypeMessageOrCollectionOf(method);
+
     return genericParameterType;
   }
 

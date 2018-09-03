@@ -45,21 +45,17 @@ public interface NsqListenerEndpoint {
   boolean ordered();
 
 
+  /**
+   * consumer auto finish
+   */
   boolean autoFinish();
 
   /**
    * Return the group of this endpoint or null if not in a group.
+   *
    * @return the group of this endpoint or null if not in a group.
    */
   String getGroup();
-
-  /**
-   * Return the concurrency for this endpoint's container.
-   *
-   * @return the concurrency.
-   * @since 2.2
-   */
-  Integer getConcurrency();
 
   /**
    * Return the autoStartup for this endpoint's container.

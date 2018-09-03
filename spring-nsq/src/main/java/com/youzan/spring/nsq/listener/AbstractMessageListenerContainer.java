@@ -143,35 +143,6 @@ public abstract class AbstractMessageListenerContainer
     }
   }
 
-//  protected void checkTopics() {
-//    if (this.containerProperties.isMissingTopicsFatal()
-//        && this.containerProperties.getTopicPattern() == null) {
-//      try (Consumer consumer = this.consumerFactory
-//          .createConsumer(this.containerProperties.getGroupId(),
-//                          this.containerProperties.getClientId(), null)) {
-//        if (consumer != null) {
-//          String[] topics = this.containerProperties.getTopics();
-//          if (topics == null) {
-//            topics = Arrays.stream(this.containerProperties.getTopicPartitions())
-//                .map(tp -> tp.topic())
-//                .toArray(String[]::new);
-//          }
-//          List<String> missing = new ArrayList<>();
-//          for (String topic : topics) {
-//            if (consumer.partitionsFor(topic) == null) {
-//              missing.add(topic);
-//            }
-//          }
-//          if (missing.size() > 0) {
-//            throw new IllegalStateException(
-//                "Topic(s) " + missing.toString()
-//                + " is/are not present and missingTopicsFatal is true");
-//          }
-//        }
-//      }
-//    }
-//  }
-
   @Override
   public final void stop() {
     synchronized (this.lifecycleMonitor) {

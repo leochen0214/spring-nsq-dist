@@ -4,8 +4,6 @@ import com.youzan.nsq.client.Consumer;
 import com.youzan.nsq.client.entity.NSQMessage;
 import com.youzan.nsq.client.entity.Topic;
 
-import com.alibaba.fastjson.JSON;
-
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
@@ -13,7 +11,6 @@ import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +20,7 @@ import java.util.Map;
 public class MessagingMessageConverter implements NSQMessageConverter {
 
   private static final String PARTITION_ID = "partitionId";
+
 
   @Override
   public Message<?> toSpringMessage(NSQMessage message, Consumer consumer, Type payloadType) {
@@ -47,11 +45,8 @@ public class MessagingMessageConverter implements NSQMessageConverter {
       topic.setPartitionID(partitionId);
     }
 
-    Object payload = message.getPayload();
-    String content = JSON.toJSONString(payload);
-
     com.youzan.nsq.client.entity.Message result =
-        com.youzan.nsq.client.entity.Message.create(topic, content);
+        com.youzan.nsq.client.entity.Message.create(topic, convertPayload(message));
     result.setJsonHeaderExt(headers);
     return result;
   }
@@ -69,20 +64,23 @@ public class MessagingMessageConverter implements NSQMessageConverter {
       return null;
     }
 
-
-    if (type instanceof List){
-
-    }
-
-    try {
-      return JSON.parseObject(content, type);
-    } catch (Exception e) {
-      return content;
-    }
-
+    return content;
   }
 
+  /**
+   * Subclasses can convert the payload; by default, it's sent unchanged to Kafka.
+   *
+   * @param message the message.
+   * @return the payload.
+   */
+  protected String convertPayload(Message<?> message) {
+    Object payload = message.getPayload();
+    if (payload == null) {
+      return "";
+    }
 
+    return payload.toString();
+  }
 
 
 }

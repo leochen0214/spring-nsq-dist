@@ -10,6 +10,7 @@ import com.youzan.spring.nsq.core.ProducerFactory;
 import com.youzan.spring.nsq.listener.MessageListenerContainer;
 import com.youzan.spring.nsq.properties.ConsumerConfigProperties;
 import com.youzan.spring.nsq.properties.ProducerConfigProperties;
+import com.youzan.spring.nsq.support.converter.JsonMessageConverter;
 import com.youzan.spring.nsq.support.converter.MessagingMessageConverter;
 import com.youzan.spring.nsq.support.converter.NSQMessageConverter;
 
@@ -74,7 +75,8 @@ public class AppConfig {
 
   @Bean
   public NSQMessageConverter messageConverter() {
-    return new MessagingMessageConverter();
+//    return new MessagingMessageConverter();
+    return new JsonMessageConverter();
   }
 
 

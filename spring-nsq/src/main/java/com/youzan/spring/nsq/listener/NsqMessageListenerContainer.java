@@ -9,8 +9,6 @@ import com.youzan.spring.nsq.properties.ConsumerConfigProperties;
 
 import org.springframework.util.Assert;
 
-import java.util.Collection;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -21,9 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 public class NsqMessageListenerContainer extends AbstractMessageListenerContainer {
 
   private volatile Consumer consumer;
-  private ListenerType listenerType;
-  private MessageListener listener;
-
 
   /**
    * Construct an instance with the provided factory and properties.
@@ -43,25 +38,24 @@ public class NsqMessageListenerContainer extends AbstractMessageListenerContaine
     }
 
     ConsumerConfigProperties properties = getContainerProperties();
+    MessageListener listener = getMessageListener(properties);
+    ListenerType listenerType = ListenerUtils.determineListenerType(listener);
 
-    this.consumer = consumerFactory.createConsumer(properties);
-    this.consumer.setAutoFinish(properties.isAutoFinish());
-    Object messageListener = properties.getMessageListener();
-    Assert.state(messageListener != null, "A MessageListener is required");
-    Assert.state(messageListener instanceof MessageListener, "Listener must be a MessageListener");
-    this.listener = (MessageListener) messageListener;
+    consumer = consumerFactory.createConsumer(properties);
+    consumer.setAutoFinish(properties.isAutoFinish());
+    consumer.setMessageHandler(message -> doInvokeMessageListener(message, listener, listenerType));
+    consumer.subscribe(toArray(properties));
+    startConsumer();
+  }
 
-    this.listenerType = ListenerUtils.determineListenerType(this.listener);
-
-    this.consumer.setMessageHandler(this::doInvokeMessageListener);
-    this.consumer.subscribe(toArray(properties));
+  private void startConsumer() {
     try {
-      consumer.start();
+      this.consumer.start();
+      setRunning(true);
+      log.info("started consumer={}", this.consumer);
     } catch (NSQException e) {
       log.error("consumer start failed", e);
     }
-
-    setRunning(true);
   }
 
 
@@ -74,26 +68,33 @@ public class NsqMessageListenerContainer extends AbstractMessageListenerContaine
     }
   }
 
-  private void doInvokeMessageListener(final NSQMessage message) {
-    try {
-      switch (this.listenerType) {
-        case CONSUMER_AWARE:
-          this.listener.onMessage(message, this.consumer);
-          break;
+  private MessageListener getMessageListener(ConsumerConfigProperties properties) {
+    Object messageListener = properties.getMessageListener();
+    Assert.state(messageListener != null, "A MessageListener is required");
+    Assert.state(messageListener instanceof MessageListener, "Listener must be a MessageListener");
+    return (MessageListener) messageListener;
+  }
 
+  private void doInvokeMessageListener(NSQMessage message, MessageListener listener,
+                                       ListenerType listenerType) {
+    try {
+      switch (listenerType) {
+        case CONSUMER_AWARE:
+          listener.onMessage(message, this.consumer);
+          break;
         case SIMPLE:
-          this.listener.onMessage(message);
+          listener.onMessage(message);
           break;
       }
     } catch (Exception e) {
-      if (errorHandler != null) {
-        errorHandler.handle(e, message, this.consumer);
+      if (errorHandler == null) {
+        throw e;
       }
-      throw e;
+      errorHandler.handle(e, message, this.consumer);
     }
   }
 
-  private Topic[] toArray(ConsumerConfigProperties properties){
+  private Topic[] toArray(ConsumerConfigProperties properties) {
     Topic[] arr = new Topic[properties.getTopics().size()];
 
     int i = 0;
