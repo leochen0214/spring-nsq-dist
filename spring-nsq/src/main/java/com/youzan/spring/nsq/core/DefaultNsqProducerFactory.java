@@ -46,7 +46,10 @@ public class DefaultNsqProducerFactory implements ProducerFactory, DisposableBea
   @Override
   public void destroy() {
     // because ProducerImplV2.close() is thread safe, so we just invoke it
-    producer.close();
+    if (running && this.producer != null){
+      producer.close();
+      log.info("close producer success");
+    }
     running = false;
   }
 
