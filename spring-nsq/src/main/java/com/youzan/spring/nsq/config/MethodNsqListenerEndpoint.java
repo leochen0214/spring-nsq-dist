@@ -224,7 +224,6 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
         createMessageListenerInstance(messageConverter);
     messageListener.setHandlerMethod(configureListenerAdapter(messageListener));
 
-
     return messageListener;
   }
 

@@ -5,6 +5,7 @@ import com.youzan.nsq.client.Consumer;
 import com.youzan.nsq.client.Producer;
 import com.youzan.nsq.client.entity.NSQMessage;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import brave.Span;
@@ -90,10 +91,17 @@ public class NsqTracing {
   }
 
   TraceContextOrSamplingFlags extractAndClearHeaders(NSQMessage record) {
-    TraceContextOrSamplingFlags extracted = extractor.extract(record.getJsonExtHeader());
+    Map<String, Object> headers = record.getJsonExtHeader();
+    if (headers == null) {
+      headers = new HashMap<>();
+    }
+
+    TraceContextOrSamplingFlags extracted = extractor.extract(headers);
     // clear propagation headers if we were able to extract a span
     if (!extracted.equals(TraceContextOrSamplingFlags.EMPTY)) {
-      tracing.propagation().keys().forEach(key -> record.getJsonExtHeader().remove(key));
+      for (String key : tracing.propagation().keys()) {
+        headers.remove(key);
+      }
     }
     return extracted;
   }

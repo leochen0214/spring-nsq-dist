@@ -148,6 +148,7 @@ public class TracingConsumer implements Consumer {
       // Below is the same setup as any synchronous tracing
       try (Tracer.SpanInScope ws = tracing.tracer()
           .withSpanInScope(span)) { // so logging can see trace ID
+        logger.info("delete to origin Producer to process, message={}", message);
         delegate.incoming(frame, conn); // do the actual work
       } catch (RuntimeException | Error e) {
         span.error(e); // make sure any error gets into the span before it is finished

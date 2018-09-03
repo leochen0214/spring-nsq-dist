@@ -65,8 +65,8 @@ public class AppConfig {
     NsqMessageListenerContainerFactory factory = new NsqMessageListenerContainerFactory();
     factory.setConsumerFactory(consumerFactory());
     factory.setAutoStartup(true);
-    factory.setErrorHandler(
-        (e, data) -> log.error("occur exception, data content={}", data.getReadableContent(), e));
+//    factory.setErrorHandler(
+//        (e, data) -> log.error("occur exception, data content={}", data.getReadableContent(), e));
 
     factory.setMessageConverter(messageConverter());
 

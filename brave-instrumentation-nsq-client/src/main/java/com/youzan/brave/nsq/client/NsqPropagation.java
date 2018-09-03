@@ -11,6 +11,8 @@ import brave.propagation.Propagation;
 public class NsqPropagation {
 
   static final Propagation.Setter<Map<String, Object>, String> HEADER_SETTER = (carrier, key, value) -> {
+
+
     carrier.remove(key);
     carrier.put(key, value);
   };

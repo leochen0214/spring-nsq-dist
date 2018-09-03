@@ -7,6 +7,8 @@ import com.youzan.spring.nsq.core.ProducerFactory;
 
 import com.alibaba.fastjson.JSON;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,6 +21,7 @@ import javax.annotation.Resource;
 
 @SpringBootApplication
 public class TestNsq2Application {
+  private static final Logger logger = LoggerFactory.getLogger(TestNsq2Application.class);
 
   public static void main(String[] args) {
     SpringApplication.run(TestNsq2Application.class, args);
@@ -51,6 +54,7 @@ public class TestNsq2Application {
       producer.publish(Message.create(t1, JSON.toJSONString(p1)));
       producer.publish(Message.create(t2, JSON.toJSONString(list)));
 
+      logger.info("publish finish");
       System.out.println("publish finish");
 
     };

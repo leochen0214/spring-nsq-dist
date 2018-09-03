@@ -11,7 +11,7 @@ import com.youzan.nsq.client.exception.NSQException;
 import com.youzan.nsq.client.network.frame.NSQFrame;
 import com.youzan.util.IOUtil;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,10 +84,13 @@ public class TracingProducer implements Producer {
    */
   @Override
   public void publish(Message message) throws NSQException {
+    Map<String, Object> headers = getHeaders(message);
+    //set back if origin headers is null
+    message.setJsonHeaderExt(headers);
     //trace here
     Span span = tracing.tracer().nextSpan();
-    tracing.propagation().keys().forEach(key -> getHeaders(message).remove(key));
-    injector.inject(span.context(), getHeaders(message));
+    tracing.propagation().keys().forEach(headers::remove);
+
     if (!span.isNoop()) {
       if (remoteServiceName != null) {
         span.remoteServiceName(remoteServiceName);
@@ -97,11 +100,15 @@ public class TracingProducer implements Producer {
           .kind(Span.Kind.PRODUCER)
           .start();
     }
+    injector.inject(span.context(), headers);
     try (Tracer.SpanInScope ws = tracing.tracer().withSpanInScope(span)) {
       delegate.publish(message);
+      logger.info("end publish, message= {}", "中文");
     } catch (RuntimeException | Error e) {
-      span.error(e).finish(); // finish as an exception means the callback won't finish the span
+      span.error(e); // finish as an exception means the callback won't finish the span
       throw e;
+    }finally {
+      span.finish();
     }
   }
 
@@ -165,7 +172,7 @@ public class TracingProducer implements Producer {
   private static Map<String, Object> getHeaders(Message message) {
     Object jsonHeaderExt = message.getJsonHeaderExt();
     if (jsonHeaderExt == null) {
-      return Collections.emptyMap();
+      return new HashMap<>();
     }
 
     return (Map<String, Object>) jsonHeaderExt;
