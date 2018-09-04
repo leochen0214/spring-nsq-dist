@@ -117,27 +117,15 @@ public @interface NsqListener {
    * method throws an exception.
    *
    * @return the error handler.
-   * @since 1.3
    */
   String errorHandler() default "";
-
-  /**
-   * Override the container factory's {@code concurrency} setting for this listener. May be a
-   * property placeholder or SpEL expression that evaluates to a {@link Number}, in which case
-   * {@link Number#intValue()} is used to obtain the value.
-   *
-   * @return the concurrency.
-   * @since 2.2
-   */
-  String concurrency() default "";
 
   /**
    * Set to true or false, to override the default setting in the container factory. May be a
    * property placeholder or SpEL expression that evaluates to a {@link Boolean} or a {@link
    * String}, in which case the {@link Boolean#parseBoolean(String)} is used to obtain the value.
    *
-   * @return true to auto start, false to not auto start.
-   * @since 2.2
+   * @return true to auto start, false to not auto start, default true.
    */
   String autoStartup() default "";
 

@@ -17,17 +17,17 @@ import lombok.extern.slf4j.Slf4j;
  * @date: 2018-09-02
  */
 @Slf4j
-public class RecordMessagingMessageListenerAdapter extends MessagingMessageListenerAdapter
+public class NsqMessagingMessageListenerAdapter extends MessagingMessageListenerAdapter
     implements ConsumerAwareMessageListener {
 
   private NsqListenerErrorHandler errorHandler;
 
-  public RecordMessagingMessageListenerAdapter(Object bean, Method method) {
+  public NsqMessagingMessageListenerAdapter(Object bean, Method method) {
     this(bean, method, null);
   }
 
-  public RecordMessagingMessageListenerAdapter(Object bean, Method method,
-                                               NsqListenerErrorHandler errorHandler) {
+  public NsqMessagingMessageListenerAdapter(Object bean, Method method,
+                                            NsqListenerErrorHandler errorHandler) {
     super(bean, method);
     this.errorHandler = errorHandler;
   }

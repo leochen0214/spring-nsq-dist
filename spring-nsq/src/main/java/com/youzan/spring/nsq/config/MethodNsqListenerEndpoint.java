@@ -3,7 +3,7 @@ package com.youzan.spring.nsq.config;
 import com.youzan.spring.nsq.handler.NsqListenerErrorHandler;
 import com.youzan.spring.nsq.listener.MessageListenerContainer;
 import com.youzan.spring.nsq.listener.adapter.MessagingMessageListenerAdapter;
-import com.youzan.spring.nsq.listener.adapter.RecordMessagingMessageListenerAdapter;
+import com.youzan.spring.nsq.listener.adapter.NsqMessagingMessageListenerAdapter;
 import com.youzan.spring.nsq.support.converter.NSQMessageConverter;
 
 import org.springframework.beans.factory.BeanFactory;
@@ -237,8 +237,8 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
   protected MessagingMessageListenerAdapter createMessageListenerInstance(
       NSQMessageConverter converter) {
 
-    RecordMessagingMessageListenerAdapter listener =
-        new RecordMessagingMessageListenerAdapter(bean, method, errorHandler);
+    NsqMessagingMessageListenerAdapter listener =
+        new NsqMessagingMessageListenerAdapter(bean, method, errorHandler);
 
     listener.setMessageConverter(converter);
 
