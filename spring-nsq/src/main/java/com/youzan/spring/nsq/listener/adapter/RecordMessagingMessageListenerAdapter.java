@@ -48,9 +48,9 @@ public class RecordMessagingMessageListenerAdapter extends MessagingMessageListe
       }
 
       try {
-        Object result = this.errorHandler.handleError(data, e, consumer);
+        this.errorHandler.handleError(data, e, consumer);
         if (log.isDebugEnabled()) {
-          log.debug("NsqListenerErrorHandler handle error, result={}", result);
+          log.debug("NsqListenerErrorHandler handle error");
         }
       } catch (Exception ex) {
         throw new ListenerExecutionFailedException(createMessagingErrorMessage(

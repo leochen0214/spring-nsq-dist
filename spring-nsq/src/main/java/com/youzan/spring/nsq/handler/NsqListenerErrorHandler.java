@@ -16,10 +16,9 @@ public interface NsqListenerErrorHandler {
    * @param message   the nsq message.
    * @param exception the exception the listener threw, wrapped in a {@link
    *                  ListenerExecutionFailedException}.
-   * @return the return value is ignored unless the annotated method has a
    * @throws Exception an exception which may be the original or different.
    */
-  Object handleError(NSQMessage message, ListenerExecutionFailedException exception)
+  void handleError(NSQMessage message, ListenerExecutionFailedException exception)
       throws Exception;
 
   /**
@@ -31,10 +30,10 @@ public interface NsqListenerErrorHandler {
    * @param consumer  the consumer.
    * @throws Exception an exception which may be the original or different.
    */
-  default Object handleError(NSQMessage message, ListenerExecutionFailedException exception,
-                             Consumer consumer) throws Exception {
+  default void handleError(NSQMessage message, ListenerExecutionFailedException exception,
+                           Consumer consumer) throws Exception {
 
-    return handleError(message, exception);
+    handleError(message, exception);
   }
 
 
