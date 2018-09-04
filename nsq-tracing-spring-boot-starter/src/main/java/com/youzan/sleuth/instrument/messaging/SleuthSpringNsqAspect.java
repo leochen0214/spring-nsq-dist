@@ -1,7 +1,6 @@
 package com.youzan.sleuth.instrument.messaging;
 
 import com.youzan.brave.nsq.client.NsqTracing;
-import com.youzan.nsq.client.Consumer;
 import com.youzan.nsq.client.Producer;
 import com.youzan.spring.nsq.listener.AbstractMessageListenerContainer;
 import com.youzan.spring.nsq.listener.MessageListener;
@@ -40,9 +39,6 @@ public class SleuthSpringNsqAspect {
   private void anyProducerFactory() {
   } // NOSONAR
 
-  @Pointcut("execution(public * com.youzan.spring.nsq.core.ConsumerFactory.createConsumer(..))")
-  private void anyConsumerFactory() {
-  } // NOSONAR
 
   @Pointcut("execution(public * com.youzan.spring.nsq.core.MessageListenerContainerFactory.createListenerContainer(..))")
   private void anyCreateListenerContainer() {
@@ -54,11 +50,6 @@ public class SleuthSpringNsqAspect {
     return this.nsqTracing.producer(producer);
   }
 
-//  @Around("anyConsumerFactory()")
-//  public Object wrapConsumerFactory(ProceedingJoinPoint pjp) throws Throwable {
-//    Consumer consumer = (Consumer) pjp.proceed();
-//    return this.nsqTracing.consumer(consumer);
-//  }
 
   @Around("anyCreateListenerContainer()")
   public Object wrapListenerContainerCreation(ProceedingJoinPoint pjp) throws Throwable {
