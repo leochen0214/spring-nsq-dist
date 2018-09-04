@@ -27,9 +27,12 @@ public class JsonMessageConverter extends MessagingMessageConverter {
     }
 
     try {
-      Object o = JSON.parseObject(content, type);
-      log.info("extractAndConvertValue return value={}, type={}", o, o.getClass());
-      return o;
+      Object result = JSON.parseObject(content, type);
+      if (log.isDebugEnabled()){
+        log.debug("extractAndConvertValue return value={}, type class={}",
+                  result, result.getClass().getName());
+      }
+      return result;
     } catch (Exception e) {
       log.error("", e);
       return content;

@@ -5,8 +5,6 @@ import com.youzan.nsq.client.entity.NSQMessage;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -20,8 +18,7 @@ import brave.Tracer;
  */
 public class MessageListenerMethodInterceptor implements MethodInterceptor {
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(MessageListenerMethodInterceptor.class);
+  private static final String METHOD_NAME = "onMessage";
 
   private final NsqTracing nsqTracing;
   private final Tracer tracer;
@@ -32,25 +29,27 @@ public class MessageListenerMethodInterceptor implements MethodInterceptor {
   }
 
 
+  /**
+   * intercept {@link com.youzan.spring.nsq.listener.MessageListener} MessageListener.onMessage(..)
+   * method
+   */
   @Override
   public Object invoke(MethodInvocation invocation) throws Throwable {
-    if (!"onMessage".equals(invocation.getMethod().getName())) {
+    if (!METHOD_NAME.equals(invocation.getMethod().getName())) {
       return invocation.proceed();
     }
 
     Object[] arguments = invocation.getArguments();
-    Optional<Object> message =
-        Arrays.stream(arguments).filter(o -> o instanceof NSQMessage).findFirst();
+    Optional<Object> message = Arrays.stream(arguments)
+        .filter(o -> o instanceof NSQMessage)
+        .findFirst();
 
     if (!message.isPresent()) {
       return invocation.proceed();
     }
 
-    logger.info("Wrapping onMessage call");
-
-    Span span = this.nsqTracing.nextSpan((NSQMessage) message.get()).name("on-message").start();
+    Span span = this.nsqTracing.nextSpan((NSQMessage) message.get()).name(METHOD_NAME).start();
     try (Tracer.SpanInScope ws = this.tracer.withSpanInScope(span)) {
-      logger.info("on-message ... ");
       return invocation.proceed();
     } catch (RuntimeException | Error e) {
       String msg = e.getMessage();
@@ -61,7 +60,6 @@ public class MessageListenerMethodInterceptor implements MethodInterceptor {
       throw e;
     } finally {
       span.finish();
-      logger.info("wrapping onMessage call finish");
     }
   }
 }

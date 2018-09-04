@@ -62,29 +62,27 @@ public class SleuthSpringNsqAspect {
 
   @Around("anyCreateListenerContainer()")
   public Object wrapListenerContainerCreation(ProceedingJoinPoint pjp) throws Throwable {
-    MessageListenerContainer listener = (MessageListenerContainer) pjp.proceed();
-    if (listener instanceof AbstractMessageListenerContainer) {
-      AbstractMessageListenerContainer container = (AbstractMessageListenerContainer) listener;
-      Object someMessageListener = container.getContainerProperties().getMessageListener();
-      if (someMessageListener == null) {
-        logger.debug("No message listener to wrap. Proceeding");
-      } else if (someMessageListener instanceof MessageListener) {
-        container.setupMessageListener(createProxy(someMessageListener));
-      } else {
-        if (logger.isDebugEnabled()) {
-          logger.debug("ATM we don't support Batch message listeners");
-        }
-      }
-    } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Can't wrap this listener. Proceeding");
-      }
+    MessageListenerContainer container = (MessageListenerContainer) pjp.proceed();
+    if (!(container instanceof AbstractMessageListenerContainer)) {
+      logger.debug("Can't wrap this message listener. Proceeding");
+      return container;
     }
-    return listener;
+
+    AbstractMessageListenerContainer instance = (AbstractMessageListenerContainer) container;
+    Object someMessageListener = instance.getContainerProperties().getMessageListener();
+    if (someMessageListener == null) {
+      logger.debug("No message listener to wrap. Proceeding");
+    } else if (someMessageListener instanceof MessageListener) {
+      instance.setupMessageListener(createProxy(someMessageListener));
+    } else {
+      logger.debug("ATM we don't support other message listeners");
+    }
+
+    return container;
   }
 
 
-  Object createProxy(Object bean) {
+  private Object createProxy(Object bean) {
     ProxyFactoryBean factory = new ProxyFactoryBean();
     factory.setProxyTargetClass(true);
     factory.addAdvice(new MessageListenerMethodInterceptor(this.nsqTracing, this.tracer));

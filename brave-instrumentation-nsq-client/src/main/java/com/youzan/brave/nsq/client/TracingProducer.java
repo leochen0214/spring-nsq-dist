@@ -103,7 +103,7 @@ public class TracingProducer implements Producer {
     injector.inject(span.context(), headers);
     try (Tracer.SpanInScope ws = tracing.tracer().withSpanInScope(span)) {
       delegate.publish(message);
-      logger.info("end publish, message= {}", "中文");
+      logger.info("end publish, message= {}, ", "中文");
     } catch (RuntimeException | Error e) {
       span.error(e); // finish as an exception means the callback won't finish the span
       throw e;

@@ -22,7 +22,7 @@ import brave.Tracing;
  */
 @Configuration
 @ConditionalOnBean(Tracing.class)
-@AutoConfigureAfter({TraceAutoConfiguration.class })
+@AutoConfigureAfter({TraceAutoConfiguration.class})
 @ConditionalOnProperty(value = "spring.sleuth.messaging.enabled", matchIfMissing = true)
 public class NsqMessageTracingAutoConfiguration {
 
@@ -34,14 +34,14 @@ public class NsqMessageTracingAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-   public NsqTracing nsqTracing(Tracing tracing) {
+    public NsqTracing nsqTracing(Tracing tracing) {
       return NsqTracing.newBuilder(tracing).build();
     }
 
     @Bean
     // for tests
     @ConditionalOnMissingBean
-   public SleuthSpringNsqAspect sleuthSpringNsqAspect(NsqTracing nsqTracing, Tracer tracer) {
+    public SleuthSpringNsqAspect sleuthSpringNsqAspect(NsqTracing nsqTracing, Tracer tracer) {
       return new SleuthSpringNsqAspect(nsqTracing, tracer);
     }
   }
