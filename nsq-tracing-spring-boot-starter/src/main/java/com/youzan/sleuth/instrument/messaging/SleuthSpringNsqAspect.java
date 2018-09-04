@@ -54,11 +54,11 @@ public class SleuthSpringNsqAspect {
     return this.nsqTracing.producer(producer);
   }
 
-  @Around("anyConsumerFactory()")
-  public Object wrapConsumerFactory(ProceedingJoinPoint pjp) throws Throwable {
-    Consumer consumer = (Consumer) pjp.proceed();
-    return this.nsqTracing.consumer(consumer);
-  }
+//  @Around("anyConsumerFactory()")
+//  public Object wrapConsumerFactory(ProceedingJoinPoint pjp) throws Throwable {
+//    Consumer consumer = (Consumer) pjp.proceed();
+//    return this.nsqTracing.consumer(consumer);
+//  }
 
   @Around("anyCreateListenerContainer()")
   public Object wrapListenerContainerCreation(ProceedingJoinPoint pjp) throws Throwable {

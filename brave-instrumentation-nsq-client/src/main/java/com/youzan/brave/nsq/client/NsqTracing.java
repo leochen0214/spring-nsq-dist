@@ -1,7 +1,6 @@
 package com.youzan.brave.nsq.client;
 
 
-import com.youzan.nsq.client.Consumer;
 import com.youzan.nsq.client.Producer;
 import com.youzan.nsq.client.entity.NSQMessage;
 
@@ -29,11 +28,14 @@ public class NsqTracing {
   }
 
   public static final class Builder {
+
     final Tracing tracing;
     String remoteServiceName = "nsq";
 
     Builder(Tracing tracing) {
-      if (tracing == null) throw new NullPointerException("tracing == null");
+      if (tracing == null) {
+        throw new NullPointerException("tracing == null");
+      }
       this.tracing = tracing;
     }
 
@@ -52,7 +54,7 @@ public class NsqTracing {
   }
 
   private final Tracing tracing;
-  private final TraceContext.Extractor<Map<String,Object>> extractor;
+  private final TraceContext.Extractor<Map<String, Object>> extractor;
   private final String remoteServiceName;
 
   NsqTracing(NsqTracing.Builder builder) { // intentionally hidden constructor
@@ -61,15 +63,10 @@ public class NsqTracing {
     this.remoteServiceName = builder.remoteServiceName;
   }
 
-  /**
-   * Extracts or creates a {@link Span.Kind#CONSUMER} span for each message received. This span is
-   * injected onto each message so it becomes the parent when a processor later calls
-   */
-  public Consumer consumer(Consumer consumer) {
-    return new TracingConsumer(tracing, consumer, remoteServiceName);
-  }
 
-  /** Starts and propagates {@link Span.Kind#PRODUCER} span for each message sent. */
+  /**
+   * Starts and propagates {@link Span.Kind#PRODUCER} span for each message sent.
+   */
   public Producer producer(Producer producer) {
     return new TracingProducer(tracing, producer, remoteServiceName);
   }
@@ -96,17 +93,12 @@ public class NsqTracing {
       headers = new HashMap<>();
     }
 
-    TraceContextOrSamplingFlags extracted = extractor.extract(headers);
-    // clear propagation headers if we were able to extract a span
-    if (!extracted.equals(TraceContextOrSamplingFlags.EMPTY)) {
-      for (String key : tracing.propagation().keys()) {
-        headers.remove(key);
-      }
-    }
-    return extracted;
+    return extractor.extract(headers);
   }
 
-  /** When an upstream context was not present, lookup keys are unlikely added */
+  /**
+   * When an upstream context was not present, lookup keys are unlikely added
+   */
   static void addTags(NSQMessage record, SpanCustomizer result) {
     result.tag(NsqTags.NSQ_TOPIC_TAG, record.getTopicInfo().getTopicName());
   }
