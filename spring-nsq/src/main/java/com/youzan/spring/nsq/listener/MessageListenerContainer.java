@@ -24,15 +24,13 @@ import org.springframework.context.SmartLifecycle;
  * Internal abstraction used by the framework representing a message listener container. Not meant
  * to be implemented externally.
  *
- * @author Stephane Nicoll
- * @author Gary Russell
- * @author Vladimir Tsanev
+ * @author: clong
+ * @date: 2018-08-29
  */
 public interface MessageListenerContainer extends SmartLifecycle {
 
   /**
-   * Setup the message listener to use. Throws an {@link IllegalArgumentException} if that message
-   * listener type is not supported.
+   * Setup the message listener to use. It's type of {@link MessageListener}
    *
    * @param messageListener the {@code object} to wrapped to the {@code MessageListener}.
    */
@@ -43,7 +41,6 @@ public interface MessageListenerContainer extends SmartLifecycle {
    * Return the container properties for this container.
    *
    * @return the properties.
-   * @since 2.1.3
    */
   default ConsumerConfigProperties getContainerProperties() {
     throw new UnsupportedOperationException(
@@ -56,7 +53,6 @@ public interface MessageListenerContainer extends SmartLifecycle {
    *
    * @param autoStartup the autoStartup to set.
    * @see SmartLifecycle
-   * @since 2.2
    */
   default void setAutoStartup(boolean autoStartup) {
     // empty
