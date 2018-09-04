@@ -1,4 +1,4 @@
-package com.youzan.test;
+package com.youzan.example;
 
 import com.youzan.nsq.client.Producer;
 import com.youzan.nsq.client.entity.Message;
@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,20 +20,29 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import brave.Tracing;
+
 @SpringBootApplication
-public class TestNsq2Application {
-  private static final Logger logger = LoggerFactory.getLogger(TestNsq2Application.class);
+public class SpringNsqExampleApplication {
+
+  private static final Logger logger = LoggerFactory.getLogger(SpringNsqExampleApplication.class);
 
   public static void main(String[] args) {
-    SpringApplication.run(TestNsq2Application.class, args);
+    SpringApplication.run(SpringNsqExampleApplication.class, args);
   }
 
 
   @Resource
   ProducerFactory producerFactory;
 
+  @Resource
+  Tracing tracing;
+
+  @Value("${spring.application.name}")
+  String applicationName;
+
   @Bean
-  public CommandLineRunner runner(){
+  public CommandLineRunner runner() {
     return args -> {
 
       String topic1 = "JavaTesting-Ext";
@@ -45,17 +55,21 @@ public class TestNsq2Application {
       list.add(p1);
       list.add(p2);
 
-
       Producer producer = producerFactory.createProducer();
 
       Topic t1 = new Topic(topic1);
       Topic t2 = new Topic(topic2);
 
-      producer.publish(Message.create(t1, JSON.toJSONString(p1)));
-      producer.publish(Message.create(t2, JSON.toJSONString(list)));
+      logger.info("publish start");
 
+      for (int i = 0; i < 2; i++) {
+        Person p = getPerson("jack" + i, 18);
+        logger.info("will publish Person p={}", p);
+        producer.publish(Message.create(t1, JSON.toJSONString(p)));
+      }
+
+      producer.publish(Message.create(t2, JSON.toJSONString(list)));
       logger.info("publish finish");
-      System.out.println("publish finish");
 
     };
   }

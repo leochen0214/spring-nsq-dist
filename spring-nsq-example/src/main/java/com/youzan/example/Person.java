@@ -1,4 +1,4 @@
-package com.youzan.test;
+package com.youzan.example;
 
 /**
  * @author: clong

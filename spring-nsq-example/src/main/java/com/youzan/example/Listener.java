@@ -1,19 +1,15 @@
-package com.youzan.test;
+package com.youzan.example;
 
-import com.youzan.nsq.client.Consumer;
-import com.youzan.nsq.client.entity.NSQMessage;
 import com.youzan.spring.nsq.annotation.NsqListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author: clong
@@ -29,10 +25,10 @@ public class Listener {
   }
 
 
-//  @NsqListener(topics = "${topic}", channel = "default")
-//  public void listener2(Person person) {
-//    logger.info("listener2 person={}", person);
-//  }
+  @NsqListener(topics = "${topic}", channel = "default", errorHandler ="personListenerErrorHandler")
+  public void listener2(Person person) {
+    logger.info("listener2 person={}", person);
+  }
 
 
   @NsqListener(topics = "JavaTesting-Finish", channel = "default")
@@ -71,11 +67,9 @@ public class Listener {
 //    System.out.println("listener8, message paylod=" + message);
 //  }
 
-  @NsqListener(topics = "JavaTesting-Ext", channel = "default")
+//  @NsqListener(topics = "JavaTesting-Ext", channel = "default")
   public void listener9(@Payload Person message, @Headers MessageHeaders headers) {
-
     logger.info("listener9, message paylod={}, headers={}", message, headers);
-    System.out.println("listener9, message paylod=" + message + ", headers=" + headers);
   }
 
 //  @NsqListener(topics = "${topic}", channel = "default")

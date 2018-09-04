@@ -1,4 +1,4 @@
-package com.youzan.test;
+package com.youzan.example;
 
 import com.youzan.spring.nsq.annotation.EnableNsq;
 import com.youzan.spring.nsq.core.ConsumerFactory;
@@ -11,7 +11,6 @@ import com.youzan.spring.nsq.listener.MessageListenerContainer;
 import com.youzan.spring.nsq.properties.ConsumerConfigProperties;
 import com.youzan.spring.nsq.properties.ProducerConfigProperties;
 import com.youzan.spring.nsq.support.converter.JsonMessageConverter;
-import com.youzan.spring.nsq.support.converter.MessagingMessageConverter;
 import com.youzan.spring.nsq.support.converter.NSQMessageConverter;
 
 import org.springframework.context.annotation.Bean;
@@ -75,15 +74,8 @@ public class AppConfig {
 
   @Bean
   public NSQMessageConverter messageConverter() {
-//    return new MessagingMessageConverter();
     return new JsonMessageConverter();
   }
 
-
-
-//  @Bean
-//  public Listener listener(){
-//    return new Listener();
-//  }
 
 }

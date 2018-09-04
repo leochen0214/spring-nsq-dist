@@ -2,15 +2,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <parent>
-        <artifactId>spring-nsq-dist</artifactId>
-        <groupId>com.youzan.spring.nsq</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.4.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>test</artifactId>
+    <groupId>com.youzan.nsq.demo</groupId>
+    <artifactId>spring-nsq-example</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 
+    <properties>
+        <spring-nsq.version>1.0.0-SNAPSHOT</spring-nsq.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -27,28 +35,16 @@
         <dependency>
             <groupId>com.youzan.spring.nsq</groupId>
             <artifactId>spring-nsq</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${spring-nsq.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.youzan.spring.nsq</groupId>
             <artifactId>nsq-tracing-spring-boot-starter</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${spring-nsq.version}</version>
         </dependency>
     </dependencies>
 
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.0.4.RELEASE</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
 
     <build>
