@@ -20,7 +20,7 @@ public class NsqTemplate implements NsqOperations {
   private static final Logger logger = LoggerFactory.getLogger(NsqTemplate.class);
 
   private final NSQMessageConverter messageConverter;
-  private final Producer producer;
+  private final ProducerFactory producerFactory;
 
   public NsqTemplate(ProducerFactory producerFactory) {
     this(producerFactory, new JsonMessageConverter());
@@ -28,7 +28,7 @@ public class NsqTemplate implements NsqOperations {
 
   public NsqTemplate(ProducerFactory producerFactory, NSQMessageConverter messageConverter) {
     this.messageConverter = messageConverter;
-    this.producer = producerFactory.createProducer();
+    this.producerFactory = producerFactory;
   }
 
 
@@ -53,18 +53,22 @@ public class NsqTemplate implements NsqOperations {
   @Override
   public void execute(ProducerCallback callback) {
     Assert.notNull(callback, "ProducerCallback can't be null");
-    callback.doExecute(producer);
+    callback.doExecute(getProducer());
   }
 
 
   protected void doSend(Message nsqMessage) {
     try {
-      producer.publish(nsqMessage);
+      getProducer().publish(nsqMessage);
     } catch (NSQException e) {
       logger.warn("nsq message send failed, topic={}, message={}",
                   nsqMessage.getTopic().getTopicText(), nsqMessage, e);
       throw new NsqMessagePublishFailedException("nsq message send failed", e);
     }
+  }
+
+  protected Producer getProducer(){
+    return producerFactory.createProducer();
   }
 
 

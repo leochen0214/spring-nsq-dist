@@ -70,9 +70,9 @@ public class ConsumerConfigProperties extends ConfigProperties {
    */
   private Integer nextConsumingInSecond;
 
-  private Integer attemptWarningThresdhold;
+  private Integer attemptWarningThreshold;
 
-  private Integer attemptErrorThresdhold;
+  private Integer attemptErrorThreshold;
 
 
 }

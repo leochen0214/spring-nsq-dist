@@ -61,7 +61,6 @@ public interface NsqListenerEndpoint {
    * Return the autoStartup for this endpoint's container.
    *
    * @return the autoStartup.
-   * @since 2.2
    */
   Boolean getAutoStartup();
 

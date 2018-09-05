@@ -92,12 +92,12 @@ public class DefaultNsqConsumerFactory implements ConsumerFactory {
       config.setNextConsumingInSeconds(properties.getNextConsumingInSecond());
     }
 
-    if (properties.getAttemptWarningThresdhold() != null) {
-      config.setAttemptWarningThresdhold(properties.getAttemptWarningThresdhold());
+    if (properties.getAttemptWarningThreshold() != null) {
+      config.setAttemptWarningThresdhold(properties.getAttemptWarningThreshold());
     }
 
-    if (properties.getAttemptErrorThresdhold() != null) {
-      config.setAttemptErrorThresdhold(properties.getAttemptErrorThresdhold());
+    if (properties.getAttemptErrorThreshold() != null) {
+      config.setAttemptErrorThresdhold(properties.getAttemptErrorThreshold());
     }
 
     return config;
