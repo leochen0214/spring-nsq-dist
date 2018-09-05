@@ -229,8 +229,8 @@ public class NsqListenerAnnotationBeanPostProcessor implements BeanPostProcessor
     endpoint.setId(getEndpointId(listener));
     endpoint.setTopics(resolveTopics(listener));
     endpoint.setChannel(resolver.resolveExpressionAsString(listener.channel(), "channel"));
-    endpoint
-        .setAutoStartup(resolver.resolveExpressionAsBoolean(listener.autoStartup(), "autoStartup"));
+    endpoint.setAutoStartup(resolver.resolveExpressionAsBoolean(listener.autoStartup(), "autoStartup"));
+    endpoint.setPartitionID(resolver.resolveExpressionAsInteger(listener.partitionID(), "partitionID"));
     endpoint.setOrdered(listener.ordered());
     endpoint.setAutoFinish(listener.autoFinish());
     setGroup(endpoint, listener);
@@ -265,8 +265,7 @@ public class NsqListenerAnnotationBeanPostProcessor implements BeanPostProcessor
   }
 
   private NsqListenerErrorHandler getErrorHandler(NsqListener listener) {
-    String
-        errorHandlerBeanName =
+    String errorHandlerBeanName =
         resolver.resolveExpressionAsString(listener.errorHandler(), "errorHandler");
 
     if (StringUtils.hasText(errorHandlerBeanName)) {

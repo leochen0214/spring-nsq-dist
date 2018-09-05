@@ -33,6 +33,7 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
   private final Collection<String> topics = new ArrayList<>();
   private String channel;
   private Boolean autoStartup;
+  private Integer partitionID;
   private Boolean ordered;
   private Boolean autoFinish;
   private String group;
@@ -114,6 +115,14 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
     this.autoStartup = autoStartup;
   }
 
+  @Override
+  public Integer getPartitionID() {
+    return partitionID;
+  }
+
+  public void setPartitionID(Integer partitionID) {
+    this.partitionID = partitionID;
+  }
 
   /**
    * Set the object instance that should manage this endpoint.
@@ -215,8 +224,9 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
   }
 
 
-  protected MessagingMessageListenerAdapter createMessageListener(MessageListenerContainer container,
-                                                                  NSQMessageConverter messageConverter) {
+  protected MessagingMessageListenerAdapter createMessageListener(
+      MessageListenerContainer container,
+      NSQMessageConverter messageConverter) {
     Assert.state(this.messageHandlerMethodFactory != null,
                  "Could not create message listener - MessageHandlerMethodFactory not set");
 
@@ -248,13 +258,14 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
 
   /**
    * Create a {@link InvocableHandlerMethod} for this listener adapter.
+   *
    * @param messageListener the listener adapter.
    * @return the handler adapter.
    */
-  protected InvocableHandlerMethod configureListenerAdapter(MessagingMessageListenerAdapter messageListener) {
+  protected InvocableHandlerMethod configureListenerAdapter(
+      MessagingMessageListenerAdapter messageListener) {
     return this.messageHandlerMethodFactory.createInvocableHandlerMethod(getBean(), getMethod());
   }
-
 
 
 }

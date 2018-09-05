@@ -67,6 +67,7 @@ public class NsqMessageListenerContainerFactory
     properties.setChannel(endpoint.getChannel());
     properties.setOrdered(endpoint.ordered());
     properties.setAutoFinish(endpoint.autoFinish());
+    properties.setPartitionID(endpoint.getPartitionID());
 
     return new NsqMessageListenerContainer(consumerFactory, properties);
   }

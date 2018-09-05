@@ -40,6 +40,11 @@ public interface NsqListenerEndpoint {
 
 
   /**
+   * Return the topic partitionID
+   */
+  Integer getPartitionID();
+
+  /**
    * The set of messages is ordered in one specified partition
    */
   boolean ordered();

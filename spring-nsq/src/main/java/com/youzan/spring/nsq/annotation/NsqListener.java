@@ -94,6 +94,12 @@ public @interface NsqListener {
    */
   String channel() default "default";
 
+  /*
+     指定消费的partition ID,默认情况下不指定,将消费topic下全部可用分区
+     Topic.setPartitionID(1);
+    */
+  String partitionID() default "-1";
+
   /**
    * The set of messages is ordered in one specified partition
    */

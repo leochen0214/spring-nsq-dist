@@ -100,8 +100,9 @@ public class NsqMessageListenerContainer extends AbstractMessageListenerContaine
     int i = 0;
     for (String topic : properties.getTopics()) {
       Topic t = new Topic(topic);
-      if (properties.getPartitionID() != null) {
-        t.setPartitionID(properties.getPartitionID());
+      Integer partitionID = properties.getPartitionID();
+      if (partitionID != null && partitionID != -1) {
+        t.setPartitionID(partitionID);
       }
       arr[i] = t;
       i++;
