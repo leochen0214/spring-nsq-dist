@@ -2,6 +2,7 @@
 == Getting started
 
 * 添加 `spring-nsq` maven依赖
+
 [source,xml,indent=0,subs="verbatim,quotes,attributes"]
 ----
 <dependency>
@@ -151,3 +152,58 @@ public class MessageSender{
     System.out.println("listener9, message paylod=" + message + ", headers=" + headers);
   }
 ----
+
+==== 支持消息重新投递策略
+
+* 应用实现 `com.youzan.spring.nsq.core.RequeuePolicy` 接口
+
+[source,java,indent=0]
+----
+/**
+ * 消息重试策略
+ * 前3次失败，每5s后重试
+ * 第4-6次失败，每1min后重试
+ * 第7-9次失败，每10min后重试
+ * 超过9次，每小时重试
+ */
+@Component
+@Slf4j
+public class SomeRequeuePolicy implements RequeuePolicy {
+
+  @Override
+  public void requeue(NSQMessage nsqMessage) {
+
+    int nextConsuming = 5;
+    if (nsqMessage.getReadableAttempts() < 3 ){
+      nextConsuming = 5;
+    }else if (nsqMessage.getReadableAttempts() >=3 && nsqMessage.getReadableAttempts() < 6){
+      nextConsuming = 60;
+    }else if (nsqMessage.getReadableAttempts() >= 6 && nsqMessage.getReadableAttempts() < 9){
+      nextConsuming = 600;
+    }else {
+      nextConsuming = NSQConfig._MAX_NEXT_CONSUMING_IN_SECOND;
+    }
+
+    try {
+      nsqMessage.setNextConsumingInSecond(nextConsuming);
+      LogUtils.warn(log, "[消息处理]-重试策略，发起第{}次重试, message={}", nsqMessage.getReadableAttempts() + 1, nsqMessage);
+    } catch (Exception e) {
+      LogUtils.error(e, log, "[消息处理]-重试策略，重试异常");
+    }
+
+  }
+}
+----
+
+* 指定 @NsqListener requeuePolicy spring bean name
+
+[source,java,indent=0]
+----
+  @NsqListener(topics = "JavaTesting-Ext", channel = "default", requeuePolicy="someRequeuePolicy")
+  public void listener7(@Payload Person person) {
+    logger.info("listener7, message paylod={}", person);
+  }
+----
+
+
+

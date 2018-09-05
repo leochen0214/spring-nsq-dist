@@ -110,7 +110,7 @@ public @interface NsqListener {
 
 
   /**
-   * The spring bean name of @{link RequenePolicy}
+   * The spring bean name of @{link RequeuePolicy}
    * @return
    */
   String requeuePolicy() default "";
