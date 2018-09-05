@@ -23,7 +23,6 @@
             <groupId>com.youzan.spring.nsq</groupId>
             <artifactId>spring-nsq</artifactId>
             <version>${project.parent.version}</version>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
