@@ -4,6 +4,7 @@ import com.youzan.nsq.client.Producer;
 import com.youzan.nsq.client.entity.Message;
 import com.youzan.nsq.client.entity.Topic;
 import com.youzan.nsq.client.exception.NSQException;
+import com.youzan.spring.nsq.bootstrap.NsqBootstrapConfiguration;
 import com.youzan.spring.nsq.core.ConsumerFactory;
 import com.youzan.spring.nsq.core.ProducerFactory;
 

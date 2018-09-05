@@ -1,5 +1,6 @@
 package com.youzan.spring.nsq.annotation;
 
+import com.youzan.spring.nsq.bootstrap.NsqBootstrapConfiguration;
 import com.youzan.spring.nsq.core.MessageListenerContainerFactory;
 
 import org.springframework.context.annotation.Import;
