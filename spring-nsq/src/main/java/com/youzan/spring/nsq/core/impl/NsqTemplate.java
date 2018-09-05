@@ -1,8 +1,10 @@
-package com.youzan.spring.nsq.core;
+package com.youzan.spring.nsq.core.impl;
 
 import com.youzan.nsq.client.Producer;
 import com.youzan.nsq.client.entity.Message;
 import com.youzan.nsq.client.exception.NSQException;
+import com.youzan.spring.nsq.core.NsqOperations;
+import com.youzan.spring.nsq.core.ProducerFactory;
 import com.youzan.spring.nsq.exception.NsqMessagePublishFailedException;
 import com.youzan.spring.nsq.support.converter.JsonMessageConverter;
 import com.youzan.spring.nsq.support.converter.NSQMessageConverter;
