@@ -1,6 +1,7 @@
 package com.youzan.spring.nsq.config;
 
 import com.youzan.spring.nsq.core.MessageListenerContainerFactory;
+import com.youzan.spring.nsq.core.RequeuePolicy;
 import com.youzan.spring.nsq.listener.MessageListenerContainer;
 import com.youzan.spring.nsq.support.converter.NSQMessageConverter;
 
@@ -24,14 +25,12 @@ public interface NsqListenerEndpoint {
    */
   String getId();
 
-
   /**
    * Return the topics for this endpoint.
    *
    * @return the topics for this endpoint.
    */
   Collection<String> getTopics();
-
 
   /**
    * Return the channel for this endpoint.
@@ -49,11 +48,15 @@ public interface NsqListenerEndpoint {
    */
   boolean ordered();
 
-
   /**
-   * consumer auto finish
+   * Weather consumer auto finish
    */
   boolean autoFinish();
+
+  /**
+   * The bean name of RequenePolicy
+   */
+  RequeuePolicy getRequeuePolicy();
 
   /**
    * Return the group of this endpoint or null if not in a group.

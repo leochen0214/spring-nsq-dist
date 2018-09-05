@@ -5,6 +5,7 @@ import com.youzan.nsq.client.entity.NSQMessage;
 import com.youzan.nsq.client.entity.Topic;
 import com.youzan.nsq.client.exception.NSQException;
 import com.youzan.spring.nsq.core.ConsumerFactory;
+import com.youzan.spring.nsq.core.RequeuePolicy;
 import com.youzan.spring.nsq.properties.ConsumerConfigProperties;
 
 import org.springframework.util.Assert;
@@ -40,10 +41,12 @@ public class NsqMessageListenerContainer extends AbstractMessageListenerContaine
     ConsumerConfigProperties properties = getContainerProperties();
     MessageListener listener = getMessageListener(properties);
     ListenerType listenerType = ListenerUtils.determineListenerType(listener);
+    RequeuePolicy requeuePolicy = properties.getRequeuePolicy();
 
     consumer = consumerFactory.createConsumer(properties);
     consumer.setAutoFinish(properties.isAutoFinish());
-    consumer.setMessageHandler(message -> doInvokeMessageListener(message, listener, listenerType));
+    consumer.setMessageHandler(
+        message -> doInvokeMessageListener(message, listener, listenerType, requeuePolicy));
     consumer.subscribe(toArray(properties));
     startConsumer();
   }
@@ -76,7 +79,7 @@ public class NsqMessageListenerContainer extends AbstractMessageListenerContaine
   }
 
   private void doInvokeMessageListener(NSQMessage message, MessageListener listener,
-                                       ListenerType listenerType) {
+                                       ListenerType listenerType, RequeuePolicy requeuePolicy) {
     try {
       switch (listenerType) {
         case CONSUMER_AWARE:
@@ -87,10 +90,13 @@ public class NsqMessageListenerContainer extends AbstractMessageListenerContaine
           break;
       }
     } catch (Exception e) {
-      if (errorHandler == null) {
-        throw e;
+      if (errorHandler != null) {
+        errorHandler.handle(e, message, this.consumer);
       }
-      errorHandler.handle(e, message, this.consumer);
+      if (requeuePolicy != null) {
+        requeuePolicy.requeue(message);
+      }
+      throw e;
     }
   }
 

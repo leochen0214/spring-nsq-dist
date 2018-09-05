@@ -1,5 +1,6 @@
 package com.youzan.spring.nsq.config;
 
+import com.youzan.spring.nsq.core.RequeuePolicy;
 import com.youzan.spring.nsq.handler.NsqListenerErrorHandler;
 import com.youzan.spring.nsq.listener.MessageListenerContainer;
 import com.youzan.spring.nsq.listener.adapter.MessagingMessageListenerAdapter;
@@ -36,6 +37,7 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
   private Integer partitionID;
   private Boolean ordered;
   private Boolean autoFinish;
+  private RequeuePolicy requeuePolicy;
   private String group;
 
   private Object bean;
@@ -124,6 +126,15 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
     this.partitionID = partitionID;
   }
 
+  @Override
+  public RequeuePolicy getRequeuePolicy() {
+    return requeuePolicy;
+  }
+
+  public void setRequeuePolicy(RequeuePolicy requeuePolicy){
+    this.requeuePolicy = requeuePolicy;
+  }
+
   /**
    * Set the object instance that should manage this endpoint.
    *
@@ -154,11 +165,10 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
    * Set the {@link MessageHandlerMethodFactory} to use to build the {@link InvocableHandlerMethod}
    * responsible to manage the invocation of this endpoint.
    *
-   * @param messageHandlerMethodFactory the {@link MessageHandlerMethodFactory} instance.
+   * @param factory the {@link MessageHandlerMethodFactory} instance.
    */
-  public void setMessageHandlerMethodFactory(
-      MessageHandlerMethodFactory messageHandlerMethodFactory) {
-    this.messageHandlerMethodFactory = messageHandlerMethodFactory;
+  public void setMessageHandlerMethodFactory(MessageHandlerMethodFactory factory) {
+    this.messageHandlerMethodFactory = factory;
   }
 
   public MessageHandlerMethodFactory getMessageHandlerMethodFactory() {
@@ -262,8 +272,7 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
    * @param messageListener the listener adapter.
    * @return the handler adapter.
    */
-  protected InvocableHandlerMethod configureListenerAdapter(
-      MessagingMessageListenerAdapter messageListener) {
+  protected InvocableHandlerMethod configureListenerAdapter(MessagingMessageListenerAdapter messageListener) {
     return this.messageHandlerMethodFactory.createInvocableHandlerMethod(getBean(), getMethod());
   }
 

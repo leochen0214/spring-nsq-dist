@@ -5,6 +5,7 @@ import com.youzan.spring.nsq.config.NsqConfigConstants;
 import com.youzan.spring.nsq.core.MessageListenerContainerFactory;
 import com.youzan.spring.nsq.config.NsqListenerEndpointRegistrar;
 import com.youzan.spring.nsq.config.NsqListenerEndpointRegistry;
+import com.youzan.spring.nsq.core.RequeuePolicy;
 import com.youzan.spring.nsq.handler.NsqListenerErrorHandler;
 import com.youzan.spring.nsq.support.ExpressionResolver;
 
@@ -233,6 +234,7 @@ public class NsqListenerAnnotationBeanPostProcessor implements BeanPostProcessor
     endpoint.setPartitionID(resolver.resolveExpressionAsInteger(listener.partitionID(), "partitionID"));
     endpoint.setOrdered(listener.ordered());
     endpoint.setAutoFinish(listener.autoFinish());
+    endpoint.setRequeuePolicy(getRequenePolicy(listener.requeuePolicy()));
     setGroup(endpoint, listener);
     endpoint.setBean(bean);
     endpoint.setMethod(m);
@@ -243,6 +245,15 @@ public class NsqListenerAnnotationBeanPostProcessor implements BeanPostProcessor
 
     MessageListenerContainerFactory<?> f = getListenerContainerFactory(listener, beanName, m);
     this.registrar.registerEndpoint(endpoint, f);
+  }
+
+  private RequeuePolicy getRequenePolicy(String beanNameExpression){
+    String beanName = resolver.resolveExpressionAsString(beanNameExpression, "requeuePolicy");
+    if (!StringUtils.hasText(beanName)) {
+      return null;
+    }
+
+    return beanFactory.getBean(beanName, RequeuePolicy.class);
   }
 
   private MessageListenerContainerFactory<?> getListenerContainerFactory(NsqListener listener,

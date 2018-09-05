@@ -1,5 +1,7 @@
 package com.youzan.spring.nsq.properties;
 
+import com.youzan.spring.nsq.core.RequeuePolicy;
+
 import java.util.Collection;
 
 import lombok.Data;
@@ -28,6 +30,10 @@ public class ConsumerConfigProperties extends ConfigProperties {
    */
   private long shutdownTimeout = DEFAULT_SHUTDOWN_TIMEOUT;
 
+  /**
+   * The re-queue policy
+   */
+  private RequeuePolicy requeuePolicy;
 
   private Collection<String> topics;
 

@@ -110,6 +110,12 @@ public @interface NsqListener {
 
 
   /**
+   * The spring bean name of @{link RequenePolicy}
+   * @return
+   */
+  String requeuePolicy() default "";
+
+  /**
    * If provided, the listener container for this listener will be added to a bean with this value
    * as its name, of type {@code Collection<MessageListenerContainer>}. This allows, for example,
    * iteration over the collection to start/stop a subset of containers.
