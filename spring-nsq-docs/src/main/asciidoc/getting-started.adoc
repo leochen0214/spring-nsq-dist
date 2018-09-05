@@ -36,10 +36,12 @@ include::{code-examples}/AppConfig.java[tag=configuration]
 ----
 @Component
 public class Listener {
+
   @NsqListener(topics = "JavaTesting-Ext", channel = "default")
   public void listener2(Person person) {
     logger.info("listener2 person={}", person);
   }
+
 }
 
 include::{code-examples}/Person.java[tag=configuration]

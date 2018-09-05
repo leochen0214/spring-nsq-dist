@@ -12,15 +12,17 @@
     <artifactId>spring-nsq-docs</artifactId>
 
 
-    <!--<properties>-->
-        <!--<revision>1.0.0-SNAPSHOT</revision>-->
-    <!--</properties>-->
-
     <dependencies>
         <dependency>
             <groupId>com.youzan.spring.nsq</groupId>
             <artifactId>spring-nsq</artifactId>
             <version>${revision}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
     </dependencies>

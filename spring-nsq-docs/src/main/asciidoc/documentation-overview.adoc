@@ -11,7 +11,7 @@ as a map for the rest of the document.
 
 [[nsq-documentation-about]]
 == About the Documentation
-Youzan Boot reference guide is available as
+spring-nsq reference guide is available as
 
 * {spring-nsq-docs}/html[HTML]
 * {spring-nsq-docs}/htmlsingle[SINGLE-HTML]
