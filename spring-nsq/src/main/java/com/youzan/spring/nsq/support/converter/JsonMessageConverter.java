@@ -4,7 +4,6 @@ import com.youzan.nsq.client.entity.NSQMessage;
 
 import com.alibaba.fastjson.JSON;
 
-import org.springframework.messaging.Message;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Type;
@@ -41,9 +40,7 @@ public class JsonMessageConverter extends MessagingMessageConverter {
   }
 
   @Override
-  protected String convertPayload(Message<?> message) {
-    Object payload = message.getPayload();
-
+  protected String convertPayload(Object payload) {
     if (payload == null) {
       return "";
     }

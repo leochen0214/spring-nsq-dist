@@ -26,7 +26,7 @@ public interface NSQMessageConverter extends MessageConverter {
   Message<?> toSpringMessage(NSQMessage message, Consumer consumer, Type payloadType);
 
   /**
-   * Convert a message to a producer record.
+   * Convert a message to a producer message.
    *
    * @param message      the message.
    * @param defaultTopic the default topic to use if no header found.
@@ -35,4 +35,13 @@ public interface NSQMessageConverter extends MessageConverter {
   com.youzan.nsq.client.entity.Message fromSpringMessage(Message<?> message, String defaultTopic);
 
 
+  /**
+   * Convert message payload to a producer message
+   *
+   * @param payload  the message payload
+   * @param topic the topic
+   * @param <T>   payload type
+   * @return the Producer Message
+   */
+  <T> com.youzan.nsq.client.entity.Message fromPayload(T payload, String topic);
 }

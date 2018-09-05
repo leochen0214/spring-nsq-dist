@@ -37,18 +37,31 @@ public class MessagingMessageConverter implements NSQMessageConverter {
   @Override
   public com.youzan.nsq.client.entity.Message fromSpringMessage(Message<?> message,
                                                                 String defaultTopic) {
-    MessageHeaders headers = message.getHeaders();
-
     Topic topic = new Topic(defaultTopic);
-    Integer partitionId = headers.get(PARTITION_ID, Integer.class);
-    if (partitionId != null) {
-      topic.setPartitionID(partitionId);
+    MessageHeaders headers = message.getHeaders();
+    if (headers != null) {
+      Integer partitionId = headers.get(PARTITION_ID, Integer.class);
+      if (partitionId != null) {
+        topic.setPartitionID(partitionId);
+      }
     }
 
     com.youzan.nsq.client.entity.Message result =
-        com.youzan.nsq.client.entity.Message.create(topic, convertPayload(message));
-    result.setJsonHeaderExt(headers);
+        com.youzan.nsq.client.entity.Message.create(topic, convertPayload(message.getPayload()));
+
+    if (headers != null) {
+      result.setJsonHeaderExt(headers);
+    }
     return result;
+  }
+
+  @Override
+  public <T> com.youzan.nsq.client.entity.Message fromPayload(T payload, String topic) {
+    if (payload == null) {
+      return null;
+    }
+
+    return com.youzan.nsq.client.entity.Message.create(new Topic(topic), convertPayload(payload));
   }
 
   /**
@@ -70,11 +83,10 @@ public class MessagingMessageConverter implements NSQMessageConverter {
   /**
    * Subclasses can convert the payload; by default, it's sent unchanged to Kafka.
    *
-   * @param message the message.
+   * @param payload the message.
    * @return the payload.
    */
-  protected String convertPayload(Message<?> message) {
-    Object payload = message.getPayload();
+  protected String convertPayload(Object payload) {
     if (payload == null) {
       return "";
     }
