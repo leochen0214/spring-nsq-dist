@@ -2,12 +2,12 @@ package com.youzan.spring.nsq.autoconfigure;
 
 import com.youzan.spring.nsq.annotation.EnableNsq;
 import com.youzan.spring.nsq.core.ConsumerFactory;
-import com.youzan.spring.nsq.core.DefaultNsqConsumerFactory;
-import com.youzan.spring.nsq.core.DefaultNsqProducerFactory;
+import com.youzan.spring.nsq.core.impl.DefaultNsqConsumerFactory;
+import com.youzan.spring.nsq.core.impl.DefaultNsqProducerFactory;
 import com.youzan.spring.nsq.core.MessageListenerContainerFactory;
-import com.youzan.spring.nsq.core.NsqMessageListenerContainerFactory;
-import com.youzan.spring.nsq.core.NsqTemplate;
+import com.youzan.spring.nsq.core.impl.NsqMessageListenerContainerFactory;
 import com.youzan.spring.nsq.core.ProducerFactory;
+import com.youzan.spring.nsq.core.impl.NsqTemplate;
 import com.youzan.spring.nsq.listener.MessageListenerContainer;
 import com.youzan.spring.nsq.properties.ConsumerConfigProperties;
 import com.youzan.spring.nsq.properties.ProducerConfigProperties;

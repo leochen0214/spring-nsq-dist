@@ -1,6 +1,8 @@
-package com.youzan.spring.nsq.core;
+package com.youzan.spring.nsq.core.impl;
 
 import com.youzan.spring.nsq.config.NsqListenerEndpoint;
+import com.youzan.spring.nsq.core.ConsumerFactory;
+import com.youzan.spring.nsq.core.MessageListenerContainerFactory;
 import com.youzan.spring.nsq.handler.ErrorHandler;
 import com.youzan.spring.nsq.listener.NsqMessageListenerContainer;
 import com.youzan.spring.nsq.properties.ConsumerConfigProperties;

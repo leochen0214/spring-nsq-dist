@@ -1,9 +1,10 @@
-package com.youzan.spring.nsq.core;
+package com.youzan.spring.nsq.core.impl;
 
 import com.youzan.nsq.client.Consumer;
 import com.youzan.nsq.client.ConsumerImplV2;
 import com.youzan.nsq.client.MessageHandler;
 import com.youzan.nsq.client.entity.NSQConfig;
+import com.youzan.spring.nsq.core.ConsumerFactory;
 import com.youzan.spring.nsq.properties.ConsumerConfigProperties;
 
 import lombok.extern.slf4j.Slf4j;
