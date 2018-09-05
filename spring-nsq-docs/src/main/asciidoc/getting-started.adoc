@@ -11,7 +11,7 @@
 </dependency>
 ----
 
-=== Non-spring-boot application: Java Configuration
+=== Non spring-boot application: Java Configuration
 
 [source,java,indent=0]
 ----

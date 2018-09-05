@@ -1,5 +1,5 @@
 <productname>youzan boot</productname>
-<releaseinfo>{youzan-boot-version}</releaseinfo>
+<releaseinfo>{spring-nsq-version}</releaseinfo>
 <copyright>
 	<year>2014-2018</year>
 </copyright>
