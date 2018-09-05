@@ -16,13 +16,13 @@
         <dependency>
             <groupId>com.youzan.spring.nsq</groupId>
             <artifactId>brave-instrumentation-nsq-client</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${revision}</version>
         </dependency>
 
         <dependency>
             <groupId>com.youzan.spring.nsq</groupId>
             <artifactId>spring-nsq</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${revision}</version>
         </dependency>
 
         <dependency>

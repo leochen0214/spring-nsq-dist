@@ -1,0 +1,25 @@
+[[nsq-documentation]]
+= spring-nsq documentation
+
+[partintro]
+--
+This section provides a brief overview of Spring Boot reference documentation. It serves
+as a map for the rest of the document.
+--
+
+
+
+[[nsq-documentation-about]]
+== About the Documentation
+Youzan Boot reference guide is available as
+
+* {spring-nsq-docs}/html[HTML]
+* {spring-nsq-docs}/htmlsingle[SINGLE-HTML]
+* {spring-nsq-docs}/pdf/spring-nsq-reference.pdf[PDF]
+* {spring-nsq-docs}/epub/spring-nsq-reference.epub[EPUB]
+
+The latest copy
+is available at {spring-nsq-version}.
+
+
+

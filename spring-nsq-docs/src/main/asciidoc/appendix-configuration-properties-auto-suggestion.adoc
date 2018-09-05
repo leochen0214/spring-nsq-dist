@@ -1,0 +1,18 @@
+:numbered!:
+[appendix]
+[[applicaton-properties-auto-suggestion]]
+== 配置选项自动提示
+* 在 `xx-config/pom.xml` 里添加 `spring-boot-configuration-processor` 依赖
+
+[source,xml,indent=0,subs="verbatim,quotes,attributes"]
+----
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-configuration-processor</artifactId>
+    <optional>true</optional>
+</dependency>
+----
+
+* 输入一些字符后会出现提示列表，效果如下
+
+image::suggestion.png[]

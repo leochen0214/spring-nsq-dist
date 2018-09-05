@@ -100,4 +100,11 @@ public class SpringNsqAutoConfiguration {
   }
 
 
+  @Bean
+  @ConditionalOnMissingBean
+  public NsqTemplate nsqTemplate(){
+    return new NsqTemplate(producerFactory(), messageConverter());
+  }
+
+
 }

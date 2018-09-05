@@ -1,0 +1,20 @@
+<fop version="1.0" encoding="UTF-8">
+
+    <!-- Base URL for resolving relative URLs -->
+    <base>./</base>
+
+    <!-- Font Base URL for resolving relative font URLs -->
+    <font-base>./</font-base>
+
+
+    <renderers>
+        <renderer mime="application/pdf">
+            <fonts>
+                <!-- register all the fonts found in a directory -->
+                <directory>fonts</directory>
+                <!-- automatically detect operating system installed fonts -->
+                <auto-detect/>
+            </fonts>
+        </renderer>
+    </renderers>
+</fop>

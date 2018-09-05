@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>spring-nsq-dist</artifactId>
+        <groupId>com.youzan.spring.nsq</groupId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>spring-nsq-docs</artifactId>
+
+
+    <!--<properties>-->
+        <!--<revision>1.0.0-SNAPSHOT</revision>-->
+    <!--</properties>-->
+
+    <dependencies>
+        <dependency>
+            <groupId>com.youzan.spring.nsq</groupId>
+            <artifactId>spring-nsq</artifactId>
+            <version>${revision}</version>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctor-maven-plugin</artifactId>
+                <version>1.5.5</version>
+                <executions>
+                    <execution>
+                        <id>generate-docbook</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDocumentName>index.adoc</sourceDocumentName>
+                            <backend>docbook5</backend>
+                            <doctype>book</doctype>
+                            <attributes>
+                                <docinfo>true</docinfo>
+                                <!-- Enable section numbering in the build using the attributes section. -->
+                                <sectnums>true</sectnums>
+                                <spring-nsq-version>${revision}</spring-nsq-version>
+                            </attributes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.agilejava.docbkx</groupId>
+                <artifactId>docbkx-maven-plugin</artifactId>
+                <version>2.0.17</version>
+                <configuration>
+                    <sourceDirectory>${basedir}/target/generated-docs</sourceDirectory>
+                    <includes>index.xml</includes>
+                    <xincludeSupported>true</xincludeSupported>
+                    <chunkedOutput>false</chunkedOutput>
+                    <foCustomization>${basedir}/src/main/docbook/xsl/pdf.xsl</foCustomization>
+                    <useExtensions>1</useExtensions>
+                    <highlightSource>1</highlightSource>
+                    <highlightXslthlConfig>${basedir}/src/main/docbook/xsl/xslthl-config.xml</highlightXslthlConfig>
+                    <chunkerOutputEncoding>UTF-8</chunkerOutputEncoding>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sf.xslthl</groupId>
+                        <artifactId>xslthl</artifactId>
+                        <version>2.1.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.sf.docbook</groupId>
+                        <artifactId>docbook-xml</artifactId>
+                        <version>5.0-all</version>
+                        <classifier>resources</classifier>
+                        <type>zip</type>
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>html-single</id>
+                        <goals>
+                            <goal>generate-html</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <htmlCustomization>${basedir}/src/main/docbook/xsl/html-singlepage.xsl</htmlCustomization>
+                            <targetDirectory>${basedir}/target/docbook/htmlsingle</targetDirectory>
+                            <postProcess>
+                                <copy todir="${basedir}/target/contents/reference/htmlsingle">
+                                    <fileset dir="${basedir}/target/docbook/htmlsingle">
+                                        <include name="**/*.html" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${basedir}/target/contents/reference/htmlsingle">
+                                    <fileset dir="${basedir}/src/main/docbook">
+                                        <include name="**/*.css" />
+                                        <include name="**/*.png" />
+                                        <include name="**/*.gif" />
+                                        <include name="**/*.jpg" />
+                                    </fileset>
+                                </copy>
+                            </postProcess>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>html</id>
+                        <goals>
+                            <goal>generate-html</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <htmlCustomization>${basedir}/src/main/docbook/xsl/html-multipage.xsl</htmlCustomization>
+                            <targetDirectory>${basedir}/target/docbook/html</targetDirectory>
+                            <chunkedOutput>true</chunkedOutput>
+                            <postProcess>
+                                <copy todir="${basedir}/target/contents/reference/html">
+                                    <fileset dir="${basedir}/target/docbook/html">
+                                        <include name="**/*.html" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${basedir}/target/contents/reference/html">
+                                    <fileset dir="${basedir}/src/main/docbook">
+                                        <include name="**/*.css" />
+                                        <include name="**/*.png" />
+                                        <include name="**/*.gif" />
+                                        <include name="**/*.jpg" />
+                                    </fileset>
+                                </copy>
+                            </postProcess>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pdf</id>
+                        <goals>
+                            <goal>generate-pdf</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <foCustomization>${basedir}/src/main/docbook/xsl/pdf.xsl</foCustomization>
+                            <externalFOPConfiguration>${basedir}/src/main/docbook/xsl/fop.xml</externalFOPConfiguration>
+                            <targetDirectory>${basedir}/target/docbook/pdf</targetDirectory>
+                            <chunkerOutputEncoding>UTF-8</chunkerOutputEncoding>
+                            <postProcess>
+                                <copy todir="${basedir}/target/contents/reference">
+                                    <fileset dir="${basedir}/target/docbook">
+                                        <include name="**/*.pdf" />
+                                    </fileset>
+                                </copy>
+                                <move file="${basedir}/target/contents/reference/pdf/index.pdf"
+                                      tofile="${basedir}/target/contents/reference/pdf/spring-nsq-reference.pdf" />
+                            </postProcess>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>epub</id>
+                        <goals>
+                            <goal>generate-epub3</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <epubCustomization>${basedir}/src/main/docbook/xsl/epub.xsl</epubCustomization>
+                            <targetDirectory>${basedir}/target/docbook/epub</targetDirectory>
+                            <postProcess>
+                                <copy todir="${basedir}/target/contents/reference/epub">
+                                    <fileset dir="${basedir}/target/docbook">
+                                        <include name="**/*.epub" />
+                                    </fileset>
+                                </copy>
+                                <move file="${basedir}/target/contents/reference/epub/index.epub"
+                                      tofile="${basedir}/target/contents/reference/epub/spring-nsq-reference.epub" />
+                            </postProcess>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

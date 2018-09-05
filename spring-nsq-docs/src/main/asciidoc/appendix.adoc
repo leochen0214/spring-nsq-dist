@@ -1,0 +1,4 @@
+[[appendix]]
+= 附录
+
+include::appendix-configuration-properties-auto-suggestion.adoc[]

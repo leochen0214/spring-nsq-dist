@@ -1,0 +1,67 @@
+[[getting-started]]
+== Getting started
+
+=== 添加 `spring-nsq` maven依赖
+[source,xml,indent=0,subs="verbatim,quotes,attributes"]
+----
+<dependency>
+    <groupId>com.youzan.spring.nsq</groupId>
+    <artifactId>spring-nsq</artifactId>
+    <version>{spring-nsq-version}</version>
+</dependency>
+----
+
+=== Non-spring-boot application: Java Configuration
+
+[source,java,indent=0]
+----
+include::{code-examples}/AppConfig.java[tag=configuration]
+----
+
+=== spring-boot application, 引入如下pom即可，无需如上显示配置
+[source,xml,indent=0,subs="verbatim,quotes,attributes"]
+----
+<dependency>
+    <groupId>com.youzan.spring.nsq</groupId>
+    <artifactId>nsq-spring-boot-starter</artifactId>
+    <version>{spring-nsq-version}</version>
+</dependency>
+----
+
+=== 应用使用
+
+==== 消费消息(业务Listener)
+
+[source,java,indent=0]
+----
+@Component
+public class Listener {
+  @NsqListener(topics = "JavaTesting-Ext", channel = "default")
+  public void listener2(Person person) {
+    logger.info("listener2 person={}", person);
+  }
+}
+
+include::{code-examples}/Person.java[tag=configuration]
+----
+
+
+==== 发送消息
+
+[source,java,indent=0]
+----
+@Component
+public class MessageSender{
+
+     @Resource
+     private NsqTemplate nsqTemplate;
+
+     public void send() {
+        Person p = new Person();
+        p.setName("jack");
+        p.setAge(18);
+        p.setSex("male");
+        nsqTemplate.send("JavaTesting-Ext", p1);
+     }
+}
+----
