@@ -1,7 +1,7 @@
 [[getting-started]]
 == Getting started
 
-=== 添加 `spring-nsq` maven依赖
+* 添加 `spring-nsq` maven依赖
 [source,xml,indent=0,subs="verbatim,quotes,attributes"]
 ----
 <dependency>
@@ -11,14 +11,18 @@
 </dependency>
 ----
 
-=== Non spring-boot application: Java Configuration
+=== Non spring-boot application
+** Java Configuration
 
 [source,java,indent=0]
 ----
 include::{code-examples}/AppConfig.java[tag=configuration]
 ----
 
-=== spring-boot application, 引入如下pom即可，无需如上显示配置
+=== spring-boot application
+
+* 引入如下pom即可，无需如上显示配置
+
 [source,xml,indent=0,subs="verbatim,quotes,attributes"]
 ----
 <dependency>
@@ -26,6 +30,12 @@ include::{code-examples}/AppConfig.java[tag=configuration]
     <artifactId>nsq-spring-boot-starter</artifactId>
     <version>{spring-nsq-version}</version>
 </dependency>
+----
+
+* application.properties
+[source,properties,indent=0,subs="verbatim,attributes,macros"]
+----
+spring.nsq.lookup-address=sqs-qa.s.qima-inc.com:4161
 ----
 
 === 应用使用
@@ -66,4 +76,78 @@ public class MessageSender{
         nsqTemplate.send("JavaTesting-Ext", p1);
      }
 }
+----
+
+== More Feature
+
+=== Consumer Feature
+消费者消息处理器支持多种类型方法参数。`@NsqListener` 中的属性支持spring ${…​} placeholders, 还支持SpEL表达式({springframework-docs}/core.html#expressions)
+
+==== support json string
+
+[source,java,indent=0]
+----
+   @NsqListener(topics = "JavaTesting-Ext", channel = "default")
+   public void listener1(String json) {
+     logger.info("listener1 personJson={}", json);
+   }
+----
+
+==== support plain POJO object
+
+[source,java,indent=0]
+----
+  @NsqListener(topics = "${topic}", channel = "default", errorHandler ="personListenerErrorHandler")
+  public void listener2(Person person) {
+    logger.info("listener2 person={}", person);
+  }
+----
+
+==== support origin NSQMessage object
+
+[source,java,indent=0]
+----
+  @NsqListener(topics = "JavaTesting-Ext", channel = "default")
+  public void listener4(NSQMessage message) {
+    logger.info("listener4 message content={}, , headers={}", message.getReadableContent(), message.getJsonExtHeader());
+  }
+----
+==== support origin NSQMessage and Consumer object
+
+[source,java,indent=0]
+----
+  @NsqListener(topics = "JavaTesting-Ext", channel = "default")
+  public void listener5(NSQMessage message, Consumer consumer) {
+    logger.info("listener5 message content={}, , headers={}", message.getReadableContent(), message.getJsonExtHeader());
+  }
+----
+
+==== support Spring-Messaging Message object
+
+[source,java,indent=0]
+----
+  @NsqListener(topics = "JavaTesting-Ext", channel = "default")
+  public void listener6(Message<Person> message) {
+    logger.info("listener6 person={}, headers=", message.getPayload(), message.getHeaders());
+  }
+----
+
+==== support Spring-Messaging annotation
+
+[source,java,indent=0]
+----
+  @NsqListener(topics = "JavaTesting-Ext", channel = "default")
+  public void listener7(@Payload Person person) {
+    logger.info("listener7, message paylod={}", person);
+  }
+
+  @NsqListener(topics = "JavaTesting-Ext", channel = "default")
+  public void listener8(@Payload Person message, @Headers MessageHeaders headers) {
+    logger.info("listener8, message paylod={}, headers={}", message, headers);
+  }
+
+  @NsqListener(topics = "${topic}", channel = "default")
+  public void listener9(@Payload Person message, @Headers Map<String, Object> headers) {
+    System.out.println("listener9, message paylod=" + message + ", headers=" + headers);
+  }
 ----

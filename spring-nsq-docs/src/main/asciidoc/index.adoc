@@ -1,5 +1,5 @@
 = spring-nsq 使用文档
-clong;
+Author: clong;
 :doctype: book
 :toc:
 :toclevels: 4
@@ -9,6 +9,7 @@ clong;
 :hide-uri-scheme:
 //:spring-boot-repo: snapshot
 :github-tag: master
+:springframework-docs: http://docs.spring.io/spring/docs/{spring-version}/spring-framework-reference
 :spring-boot-docs: http://docs.spring.io/spring-boot/docs/{youzan-boot-docs-version}/reference
 :spring-boot-docs-current: http://docs.spring.io/spring-boot/docs/current/reference
 :github-repo: spring-projects/spring-boot

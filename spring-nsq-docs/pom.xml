@@ -11,6 +11,9 @@
 
     <artifactId>spring-nsq-docs</artifactId>
 
+    <properties>
+        <spring.version>5.0.8.RELEASE</spring.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -49,6 +52,7 @@
                                 <!-- Enable section numbering in the build using the attributes section. -->
                                 <sectnums>true</sectnums>
                                 <spring-nsq-version>${revision}</spring-nsq-version>
+                                <spring-version>${spring.version}</spring-version>
                             </attributes>
                         </configuration>
                     </execution>
