@@ -86,4 +86,8 @@ public interface NsqListenerEndpoint {
                               NSQMessageConverter messageConverter);
 
 
+  /**
+   * Weather unpack transactional message, extract message really body.
+   */
+  boolean isUnpackMessage();
 }

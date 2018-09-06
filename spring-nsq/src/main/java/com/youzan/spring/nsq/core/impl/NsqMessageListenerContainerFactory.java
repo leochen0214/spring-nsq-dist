@@ -71,6 +71,7 @@ public class NsqMessageListenerContainerFactory
     properties.setAutoFinish(endpoint.autoFinish());
     properties.setPartitionID(endpoint.getPartitionID());
     properties.setRequeuePolicy(endpoint.getRequeuePolicy());
+    properties.setUnpackMessage(endpoint.isUnpackMessage());
 
     return new NsqMessageListenerContainer(consumerFactory, properties);
   }

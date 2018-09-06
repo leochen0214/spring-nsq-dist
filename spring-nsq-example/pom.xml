@@ -18,6 +18,7 @@
 
     <properties>
         <spring-nsq.version>1.0.0-SNAPSHOT</spring-nsq.version>
+        <assetcenter.version>1.0.15-RELEASE</assetcenter.version>
     </properties>
 
     <dependencies>
@@ -35,19 +36,45 @@
         <dependency>
             <groupId>com.youzan.spring.nsq</groupId>
             <artifactId>spring-nsq</artifactId>
-            <version>${spring-nsq.version}</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.youzan.spring.nsq</groupId>
-            <artifactId>nsq-tracing-spring-boot-starter</artifactId>
-            <version>${spring-nsq.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.youzan.spring.nsq</groupId>-->
+            <!--<artifactId>nsq-tracing-spring-boot-starter</artifactId>-->
+            <!--<version>${spring-nsq.version}</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+
+
+        <!-- 收单 -->
+        <dependency>
+            <groupId>com.youzan.pay</groupId>
+            <artifactId>assetcenter.api</artifactId>
+            <version>${assetcenter.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.youzan.pay</groupId>
+                    <artifactId>core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.youzan.pay.core</groupId>
+                    <artifactId>core-validate</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-test</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.youzan.pay.cardvoucher</groupId>
+                    <artifactId>cardvoucher-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

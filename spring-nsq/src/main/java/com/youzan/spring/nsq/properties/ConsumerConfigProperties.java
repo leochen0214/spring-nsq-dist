@@ -35,6 +35,9 @@ public class ConsumerConfigProperties extends ConfigProperties {
    */
   private RequeuePolicy requeuePolicy;
 
+  private boolean unpackMessage;
+
+
   private Collection<String> topics;
 
   private String channel;

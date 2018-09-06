@@ -47,3 +47,6 @@ dep.txt
 data/nsq-client-java
 data
 !*/src/test/resources/data
+
+.flattened-pom.xml
+*/.flattened-pom.xml

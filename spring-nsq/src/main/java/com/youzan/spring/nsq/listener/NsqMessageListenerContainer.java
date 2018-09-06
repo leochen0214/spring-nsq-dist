@@ -42,11 +42,12 @@ public class NsqMessageListenerContainer extends AbstractMessageListenerContaine
     MessageListener listener = getMessageListener(properties);
     ListenerType listenerType = ListenerUtils.determineListenerType(listener);
     RequeuePolicy requeuePolicy = properties.getRequeuePolicy();
+    boolean unpackMessage = properties.isUnpackMessage();
 
     consumer = consumerFactory.createConsumer(properties);
     consumer.setAutoFinish(properties.isAutoFinish());
-    consumer.setMessageHandler(
-        message -> doInvokeMessageListener(message, listener, listenerType, requeuePolicy));
+    consumer.setMessageHandler(message -> doInvokeMessageListener(message, listener, listenerType,
+                                           requeuePolicy, unpackMessage));
     consumer.subscribe(toArray(properties));
     startConsumer();
   }
@@ -79,14 +80,15 @@ public class NsqMessageListenerContainer extends AbstractMessageListenerContaine
   }
 
   private void doInvokeMessageListener(NSQMessage message, MessageListener listener,
-                                       ListenerType listenerType, RequeuePolicy requeuePolicy) {
+                                       ListenerType listenerType, RequeuePolicy requeuePolicy,
+                                       boolean unpackMessage) {
     try {
       switch (listenerType) {
         case CONSUMER_AWARE:
-          listener.onMessage(message, this.consumer);
+          listener.onMessage(message, this.consumer, unpackMessage);
           break;
         case SIMPLE:
-          listener.onMessage(message);
+          listener.onMessage(message, unpackMessage);
           break;
       }
     } catch (Exception e) {

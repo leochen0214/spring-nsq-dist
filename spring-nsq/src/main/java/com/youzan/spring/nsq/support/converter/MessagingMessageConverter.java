@@ -23,14 +23,15 @@ public class MessagingMessageConverter implements NSQMessageConverter {
 
 
   @Override
-  public Message<?> toSpringMessage(NSQMessage message, Consumer consumer, Type payloadType) {
+  public Message<?> toSpringMessage(NSQMessage message, Consumer consumer,
+                                    Type payloadType, boolean unpackMessage) {
     Map<String, Object> rawHeaders = message.getJsonExtHeader();
     if (rawHeaders == null) {
       rawHeaders = new HashMap<>();
     }
     rawHeaders.putIfAbsent(PARTITION_ID, message.getTopicInfo().getTopicPartition());
     MessageHeaders headers = new MessageHeaders(rawHeaders);
-    return MessageBuilder.createMessage(extractAndConvertValue(message, payloadType), headers);
+    return MessageBuilder.createMessage(extractAndConvertValue(message, payloadType, unpackMessage), headers);
   }
 
 
@@ -71,7 +72,7 @@ public class MessagingMessageConverter implements NSQMessageConverter {
    * @param type    the required type.
    * @return the value.
    */
-  protected Object extractAndConvertValue(NSQMessage message, Type type) {
+  protected Object extractAndConvertValue(NSQMessage message, Type type, boolean unpackMessage) {
     String content = message.getReadableContent();
     if (!StringUtils.hasText(content)) {
       return null;

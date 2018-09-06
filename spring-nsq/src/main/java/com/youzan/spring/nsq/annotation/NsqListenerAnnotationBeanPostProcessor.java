@@ -234,7 +234,8 @@ public class NsqListenerAnnotationBeanPostProcessor implements BeanPostProcessor
     endpoint.setPartitionID(resolver.resolveExpressionAsInteger(listener.partitionID(), "partitionID"));
     endpoint.setOrdered(listener.ordered());
     endpoint.setAutoFinish(listener.autoFinish());
-    endpoint.setRequeuePolicy(getRequenePolicy(listener.requeuePolicy()));
+    endpoint.setRequeuePolicy(getRequeuePolicy(listener.requeuePolicy()));
+    endpoint.setUnpackMessage(listener.unpackMessage());
     setGroup(endpoint, listener);
     endpoint.setBean(bean);
     endpoint.setMethod(m);
@@ -247,7 +248,7 @@ public class NsqListenerAnnotationBeanPostProcessor implements BeanPostProcessor
     this.registrar.registerEndpoint(endpoint, f);
   }
 
-  private RequeuePolicy getRequenePolicy(String beanNameExpression){
+  private RequeuePolicy getRequeuePolicy(String beanNameExpression){
     String beanName = resolver.resolveExpressionAsString(beanNameExpression, "requeuePolicy");
     if (!StringUtils.hasText(beanName)) {
       return null;

@@ -18,7 +18,7 @@ public interface GenericMessageListener<T> {
    *
    * @param data the data to be processed.
    */
-  void onMessage(T data);
+  void onMessage(T data, boolean unpackMessage);
 
 
   /**
@@ -28,7 +28,7 @@ public interface GenericMessageListener<T> {
    * @param data     the data to be processed.
    * @param consumer the consumer.
    */
-  default void onMessage(T data, Consumer consumer) {
+  default void onMessage(T data, Consumer consumer, boolean unpackMessage) {
     throw new UnsupportedOperationException("Container should never call this");
   }
 

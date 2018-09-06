@@ -111,7 +111,6 @@ public @interface NsqListener {
 
   /**
    * The spring bean name of @{link RequeuePolicy}
-   * @return
    */
   String requeuePolicy() default "";
 
@@ -140,6 +139,12 @@ public @interface NsqListener {
    * @return true to auto start, false to not auto start, default true.
    */
   String autoStartup() default "";
+
+
+  /**
+   * unpack transactional message, extract message really body
+   */
+  boolean unpackMessage() default false;
 
 
 }

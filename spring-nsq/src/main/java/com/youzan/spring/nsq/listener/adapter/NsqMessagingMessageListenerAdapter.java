@@ -34,8 +34,8 @@ public class NsqMessagingMessageListenerAdapter extends MessagingMessageListener
 
 
   @Override
-  public void onMessage(NSQMessage data, Consumer consumer) {
-    Message<?> message = toMessagingMessage(data, consumer);
+  public void onMessage(NSQMessage data, Consumer consumer, boolean unpackMessage) {
+    Message<?> message = toMessagingMessage(data, consumer, unpackMessage);
     if (log.isDebugEnabled()) {
       log.debug("Processing [" + message + "]");
     }

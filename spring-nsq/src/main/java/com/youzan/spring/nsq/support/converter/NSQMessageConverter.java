@@ -23,7 +23,7 @@ public interface NSQMessageConverter extends MessageConverter {
    * @param payloadType the required payload type.
    * @return the message.
    */
-  Message<?> toSpringMessage(NSQMessage message, Consumer consumer, Type payloadType);
+  Message<?> toSpringMessage(NSQMessage message, Consumer consumer, Type payloadType, boolean unpackMessage);
 
   /**
    * Convert a message to a producer message.

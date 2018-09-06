@@ -38,6 +38,7 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
   private Boolean ordered;
   private Boolean autoFinish;
   private RequeuePolicy requeuePolicy;
+  private boolean unpackMessage;
   private String group;
 
   private Object bean;
@@ -133,6 +134,15 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
 
   public void setRequeuePolicy(RequeuePolicy requeuePolicy){
     this.requeuePolicy = requeuePolicy;
+  }
+
+  @Override
+  public boolean isUnpackMessage() {
+    return unpackMessage;
+  }
+
+  public void setUnpackMessage(boolean unpackMessage) {
+    this.unpackMessage = unpackMessage;
   }
 
   /**
@@ -235,8 +245,7 @@ public class MethodNsqListenerEndpoint implements NsqListenerEndpoint, BeanFacto
 
 
   protected MessagingMessageListenerAdapter createMessageListener(
-      MessageListenerContainer container,
-      NSQMessageConverter messageConverter) {
+      MessageListenerContainer container, NSQMessageConverter messageConverter) {
     Assert.state(this.messageHandlerMethodFactory != null,
                  "Could not create message listener - MessageHandlerMethodFactory not set");
 

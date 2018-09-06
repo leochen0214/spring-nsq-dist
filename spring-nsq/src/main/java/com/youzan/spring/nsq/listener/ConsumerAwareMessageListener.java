@@ -17,12 +17,12 @@ public interface ConsumerAwareMessageListener extends MessageListener {
    * @param data the data to be processed.
    */
   @Override
-  default void onMessage(NSQMessage data) {
+  default void onMessage(NSQMessage data, boolean unpackMessage) {
     throw new UnsupportedOperationException("Container should never call this");
   }
 
   @Override
-  void onMessage(NSQMessage data, Consumer consumer);
+  void onMessage(NSQMessage data, Consumer consumer, boolean unpackMessage);
 
 
 }

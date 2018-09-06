@@ -100,8 +100,8 @@ public class MessagingMessageListenerAdapter {
   }
 
 
-  protected Message<?> toMessagingMessage(NSQMessage record, Consumer consumer) {
-    return getMessageConverter().toSpringMessage(record, consumer, getType());
+  protected Message<?> toMessagingMessage(NSQMessage record, Consumer consumer, boolean unpackMessage) {
+    return getMessageConverter().toSpringMessage(record, consumer, getType(), unpackMessage);
   }
 
   /**
