@@ -72,14 +72,14 @@ public class JsonMessageConverter extends MessagingMessageConverter {
   }
 
   @Data
-  static class TransactionalMessage {
+  public static class TransactionalMessage {
 
     private Headers headers;
     private String bizBody;
   }
 
   @Data
-  static class Headers {
+  public static class Headers {
 
     private String actionId;
     private String txId;
