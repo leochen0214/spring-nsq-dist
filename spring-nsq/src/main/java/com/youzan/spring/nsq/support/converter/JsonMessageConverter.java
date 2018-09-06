@@ -28,12 +28,17 @@ public class JsonMessageConverter extends MessagingMessageConverter {
 
     String json = content;
     if (unpackMessage) {
-      TransactionalMessage data = JSON.parseObject(content, TransactionalMessage.class);
-      json = data.getBizBody();
+      TransactionalMessage data = null;
+      try {
+        data = (TransactionalMessage) tryParseObject(content, TransactionalMessage.class);
+        json = data.getBizBody();
+      } catch (Exception e) {
+        log.error("can't parse this dts message: {} string to type: {}", content, type, e);
+      }
     }
 
     try {
-      Object result = JSON.parseObject(json, type);
+      Object result = tryParseObject(json, type);
       if (log.isDebugEnabled()) {
         log.debug("extractAndConvertValue return value={}, type class={}",
                   result, result.getClass().getName());
@@ -43,7 +48,18 @@ public class JsonMessageConverter extends MessagingMessageConverter {
       log.warn("parse json occur exception, content={}", content, e);
       return content;
     }
+  }
 
+  protected Object tryParseObject(String json, Type type) {
+    try {
+      return JSON.parseObject(json, type);
+    } catch (Exception e) {
+      log.error(
+          "try parse json={} to type {} occur exception, will try first parse to String and then parse to target type",
+          json, type, e);
+      String s = JSON.parseObject(json, String.class);
+      return JSON.parseObject(s, type);
+    }
   }
 
   @Override
