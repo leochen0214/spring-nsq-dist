@@ -232,11 +232,11 @@ public class MessagingMessageListenerAdapter {
       String stateMessage = "A parameter of type '%s' must be the only parameter "
                             + "(except for an optional 'Acknowledgment' and/or 'Consumer')";
       Assert.state(!this.isConsumerRecords,
-                   () -> String.format(stateMessage, "ConsumerRecords"));
+                   String.format(stateMessage, "ConsumerRecords"));
       Assert.state(!this.isConsumerRecordList,
-                   () -> String.format(stateMessage, "List<ConsumerRecord>"));
+                   String.format(stateMessage, "List<ConsumerRecord>"));
       Assert.state(!this.isMessageList,
-                   () -> String.format(stateMessage, "List<Message<?>>"));
+                   String.format(stateMessage, "List<Message<?>>"));
     }
 
     return genericParameterType;
