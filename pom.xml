@@ -28,6 +28,7 @@
 
         <junit-jupiter.version>5.2.0</junit-jupiter.version>
         <junit-platform.version>1.2.0</junit-platform.version>
+        <powermock.version>1.7.1</powermock.version>
         <lombok.version>1.18.2</lombok.version>
         <brave.version>5.2.0</brave.version>
         <spring-cloud-dependencies.version>Finchley.SR1</spring-cloud-dependencies.version>
