@@ -205,5 +205,83 @@ public class SomeRequeuePolicy implements RequeuePolicy {
   }
 ----
 
+==== 支持解析dts消息
+
+dts发送的消息，会在原有POJO对象上包装一层, headers 和 bizBody， 消息Listener可以指定 `unpackMessage=true`, 这样就可以提取出原有POJO对象
+
+[source,java,indent=0]
+----
+   @NsqListener(topics = "${nsq.topic.assetcenter.pay}", channel = "${nsq.channel.assetcenter.pay}", unpackMessage = true)
+   public void onPaymentSuccess(UniformPayEvent uniformPayEvent) {
+     if (uniformPayEvent == null) {
+       return;
+     }
+
+     if (!isPaySuccess(uniformPayEvent.getStatus())) {
+       return;
+     }
+
+     String tradeNo = getTradeNo(uniformPayEvent);
+     if (StringUtils.isBlank(tradeNo)) {
+       return;
+     }
+
+     doProcessAndSend(uniformPayEvent, tradeNo);
+   }
+----
+
+
+=== Producer
+
+消息发送，提供了Spring Template一贯风格的接口
+
+[source,java,indent=0]
+----
+public interface NsqOperations {
+
+
+  /**
+   * send with payload data
+   *
+   * @param topic the topic name
+   * @param data  the payload data
+   * @param <T>   the payload type
+   * @throws NsqMessagePublishFailedException throws exception when message send failed
+   */
+  <T> void send(String topic, T data) throws NsqMessagePublishFailedException;
+
+  /**
+   * send with nsq client origin Message
+   */
+  void send(Message nsqMessage) throws NsqMessagePublishFailedException;
+
+  /**
+   * send with Spring-Messaging message
+   *
+   * @param topic         the topic name
+   * @param springMessage the Spring-Messaging message
+   */
+  void send(String topic, org.springframework.messaging.Message<?> springMessage)
+      throws NsqMessagePublishFailedException;
+
+
+  /**
+   * send with ProducerCallback
+   *
+   * @param callback the ProducerCallback
+   * @throws NsqMessagePublishFailedException throws exception when message send failed
+   */
+  void execute(ProducerCallback callback) throws NSQException;
+
+
+  interface ProducerCallback {
+
+    void doExecute(Producer producer) throws NSQException;
+  }
+
+}
+----
+
+
 
 
