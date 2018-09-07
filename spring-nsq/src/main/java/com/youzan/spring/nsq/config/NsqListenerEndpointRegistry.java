@@ -166,8 +166,7 @@ public class NsqListenerEndpointRegistry implements DisposableBean, SmartLifecyc
     }
 
     int containerPhase = container.getPhase();
-    if (container.isAutoStartup() &&
-        containerPhase != DEFAULT_PHASE) {  // a custom phase value
+    if (container.isAutoStartup() && containerPhase != DEFAULT_PHASE) {  // a custom phase value
       if (this.phase != DEFAULT_PHASE && this.phase != containerPhase) {
         throw new IllegalStateException("Encountered phase mismatch between container "
                                         + "factory definitions: " + this.phase + " vs "

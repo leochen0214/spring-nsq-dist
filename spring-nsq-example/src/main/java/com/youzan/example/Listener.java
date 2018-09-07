@@ -19,10 +19,10 @@ import java.util.List;
 public class Listener {
   private static final Logger logger = LoggerFactory.getLogger(Listener.class);
 
-  @NsqListener(topics = "JavaTesting-Ext", channel = "default", unpackMessage = true)
-  public void listener1(UniformPayEvent payEvent) {
-    logger.info("listener1 payEvent={}", payEvent);
-  }
+//  @NsqListener(topics = "JavaTesting-Ext", channel = "default", unpackMessage = true)
+//  public void listener1(UniformPayEvent payEvent) {
+//    logger.info("listener1 payEvent={}", payEvent);
+//  }
 
 
 //  @NsqListener(topics = "${topic}", channel = "default", errorHandler ="personListenerErrorHandler")

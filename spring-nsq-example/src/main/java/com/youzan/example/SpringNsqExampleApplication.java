@@ -21,7 +21,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import brave.Tracing;
 
 @SpringBootApplication
 public class SpringNsqExampleApplication {
@@ -36,16 +35,14 @@ public class SpringNsqExampleApplication {
   @Resource
   ProducerFactory producerFactory;
 
-  @Resource
-  NsqTemplate nsqTemplate;
+//  @Resource
+//  NsqTemplate nsqTemplate;
 
-  @Resource
-  Tracing tracing;
 
   @Value("${spring.application.name}")
   String applicationName;
 
-  @Bean
+//  @Bean
   public CommandLineRunner runner() {
     return args -> {
 

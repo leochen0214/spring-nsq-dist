@@ -282,6 +282,8 @@ public interface NsqOperations {
 }
 ----
 
+== Architecture
 
+image::spring-nsq-architecture.png[]
 
 
