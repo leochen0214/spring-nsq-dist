@@ -22,7 +22,7 @@ public class JsonMessageConverterTest {
   private JsonMessageConverter messageConverter = new JsonMessageConverter();
 
   @Test
-  public void test_parsePaySuccessMessage() {
+  public void test_parseTransactionalMessage() {
     String json =
         "{\"headers\":{\"actionId\":\"a\",\"txId\":\"tx-1\"},\"bizBody\":{\"age\":18,\"name\":\"jack\"}}";
 

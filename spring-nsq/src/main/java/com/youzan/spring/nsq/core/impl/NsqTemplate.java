@@ -53,7 +53,7 @@ public class NsqTemplate implements NsqOperations {
   }
 
   @Override
-  public void execute(ProducerCallback callback) {
+  public void execute(ProducerCallback callback) throws NSQException {
     Assert.notNull(callback, "ProducerCallback can't be null");
     callback.doExecute(getProducer());
   }

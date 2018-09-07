@@ -2,6 +2,7 @@ package com.youzan.spring.nsq.core;
 
 import com.youzan.nsq.client.Producer;
 import com.youzan.nsq.client.entity.Message;
+import com.youzan.nsq.client.exception.NSQException;
 import com.youzan.spring.nsq.exception.NsqMessagePublishFailedException;
 
 /**
@@ -44,12 +45,12 @@ public interface NsqOperations {
    * @param callback the ProducerCallback
    * @throws NsqMessagePublishFailedException throws exception when message send failed
    */
-  void execute(ProducerCallback callback) throws NsqMessagePublishFailedException;
+  void execute(ProducerCallback callback) throws NSQException;
 
 
   interface ProducerCallback {
 
-    void doExecute(Producer producer);
+    void doExecute(Producer producer) throws NSQException;
   }
 
 }
