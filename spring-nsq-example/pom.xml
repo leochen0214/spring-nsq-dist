@@ -17,7 +17,7 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
-        <spring-nsq.version>1.0.0-SNAPSHOT</spring-nsq.version>
+        <spring-nsq-dependencies.version>1.0.0-SNAPSHOT</spring-nsq-dependencies.version>
         <assetcenter.version>1.0.15-RELEASE</assetcenter.version>
     </properties>
 
@@ -36,14 +36,12 @@
         <dependency>
             <groupId>com.youzan.spring.nsq</groupId>
             <artifactId>spring-nsq</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>com.youzan.spring.nsq</groupId>-->
-            <!--<artifactId>nsq-tracing-spring-boot-starter</artifactId>-->
-            <!--<version>${spring-nsq.version}</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.youzan.spring.nsq</groupId>
+            <artifactId>nsq-tracing-spring-boot-starter</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -79,6 +77,17 @@
     </dependencies>
 
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.youzan.spring.nsq</groupId>
+                <artifactId>spring-nsq-dependencies</artifactId>
+                <version>${spring-nsq-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>

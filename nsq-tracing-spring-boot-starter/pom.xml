@@ -3,9 +3,10 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>spring-nsq-dist</artifactId>
         <groupId>com.youzan.spring.nsq</groupId>
+        <artifactId>spring-nsq-dependencies</artifactId>
         <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../spring-nsq-dependencies</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,13 +17,23 @@
         <dependency>
             <groupId>com.youzan.spring.nsq</groupId>
             <artifactId>brave-instrumentation-nsq-client</artifactId>
-            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.youzan.spring.nsq</groupId>
             <artifactId>spring-nsq</artifactId>
-            <version>${revision}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.youzan</groupId>
+            <artifactId>NSQ-Client</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

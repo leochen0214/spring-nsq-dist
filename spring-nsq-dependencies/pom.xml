@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>spring-nsq-dist</artifactId>
+        <groupId>com.youzan.spring.nsq</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>spring-nsq-dependencies</artifactId>
+    <packaging>pom</packaging>
+
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <main.basedir>${basedir}../</main.basedir>
+
+        <junit-jupiter.version>5.2.0</junit-jupiter.version>
+        <powermock.version>1.7.1</powermock.version>
+        <lombok.version>1.18.2</lombok.version>
+        <brave.version>5.2.0</brave.version>
+        <spring-cloud-dependencies.version>Finchley.SR1</spring-cloud-dependencies.version>
+        <spring.version>5.0.8.RELEASE</spring.version>
+        <spring-boot.version>2.0.4.RELEASE</spring-boot.version>
+        <nsq-client.version>2.4.2.2-RELEASE</nsq-client.version>
+        <fastjson.version>1.2.49</fastjson.version>
+        <spring-nsq-dependencies.version>1.0.0-SNAPSHOT</spring-nsq-dependencies.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.youzan.spring.nsq</groupId>
+                <artifactId>spring-nsq</artifactId>
+                <version>${spring-nsq-dependencies.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.youzan.spring.nsq</groupId>
+                <artifactId>spring-nsq-spring-boot-starter</artifactId>
+                <version>${spring-nsq-dependencies.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.youzan.spring.nsq</groupId>
+                <artifactId>brave-instrumentation-nsq-client</artifactId>
+                <version>${spring-nsq-dependencies.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.youzan.spring.nsq</groupId>
+                <artifactId>nsq-tracing-spring-boot-starter</artifactId>
+                <version>${spring-nsq-dependencies.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${spring.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- spring cloud -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.zipkin.brave</groupId>
+                <artifactId>brave-bom</artifactId>
+                <version>${brave.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.youzan</groupId>
+                <artifactId>NSQ-Client</artifactId>
+                <version>${nsq-client.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

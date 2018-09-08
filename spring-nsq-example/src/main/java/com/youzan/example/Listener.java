@@ -1,5 +1,6 @@
 package com.youzan.example;
 
+import com.youzan.pay.assetcenter.api.nsq.model.UniformPayEvent;
 import com.youzan.spring.nsq.annotation.NsqListener;
 
 import org.slf4j.Logger;
@@ -20,9 +21,9 @@ public class Listener {
   private static final Logger logger = LoggerFactory.getLogger(Listener.class);
 
 //  @NsqListener(topics = "JavaTesting-Ext", channel = "default", unpackMessage = true)
-//  public void listener1(UniformPayEvent payEvent) {
-//    logger.info("listener1 payEvent={}", payEvent);
-//  }
+  public void listener1(UniformPayEvent payEvent) {
+    logger.info("listener1 payEvent={}", payEvent);
+  }
 
 
 //  @NsqListener(topics = "${topic}", channel = "default", errorHandler ="personListenerErrorHandler")
@@ -67,7 +68,7 @@ public class Listener {
 //    System.out.println("listener8, message paylod=" + message);
 //  }
 
-//  @NsqListener(topics = "JavaTesting-Ext", channel = "default")
+  @NsqListener(topics = "JavaTesting-Ext", channel = "default")
   public void listener9(@Payload Person message, @Headers MessageHeaders headers) {
     logger.info("listener9, message paylod={}, headers={}", message, headers);
   }
