@@ -3,7 +3,7 @@
 
 [partintro]
 --
-This section provides a brief overview of Spring Boot reference documentation. It serves
+This section provides a brief overview of Spring NSQ reference documentation. It serves
 as a map for the rest of the document.
 --
 
@@ -21,5 +21,11 @@ spring-nsq reference guide is available as
 The latest copy
 is available at {spring-nsq-version}.
 
+== System Requirements
+
+* Java 8
+* NSQ-Client 2.4.2.2-RELEASE
+* springframework 4.x or 5.x (recommend 5.x)
+* Spring Boot (optional) 1.x or 2.x (recommend 2.x)
 
 

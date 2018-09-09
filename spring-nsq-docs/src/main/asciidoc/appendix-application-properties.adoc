@@ -1,0 +1,61 @@
+:numbered!:
+[appendix]
+[[common-application-properties]]
+== spring-nsq config properties
+
+WARNING: This sample file is meant as a guide only. Do **not** copy and paste the entire
+content into your application. Rather, pick only the properties that you need.
+
+
+[source,properties,indent=0,subs="verbatim,attributes,macros"]
+----
+# ===================================================================
+# common
+# ===================================================================
+
+# nsq lookup address
+spring.nsq.lookup-address=sqs-qa.s.qima-inc.com:4161
+
+# ===================================================================
+# consumer
+# ===================================================================
+
+
+# consumer工作线程池大小,default value: cpu核心数 * 4
+spring.nsq.consumer-worker-pool-size=8
+
+# 消息消费client和server超时时间(unit: ms)，default value: 60s
+spring.nsq.message-interactive-timeout=60000
+
+# tcp connection timeout, default value: 500ms
+spring.nsq.connect-timeout=500
+
+# connection heart beat validation timeout, default value: 3000ms
+spring.nsq.query-timeout=3000
+spring.nsq.attempt-warning-threshold=10
+spring.nsq.attempt-error-threshold=50
+
+
+# ===================================================================
+# producer
+# ===================================================================
+
+# Producer 每个partition 工作线程池大小, default value: 30
+spring.nsq.connection-pool-size=30
+
+# Specify timeout for waiting for connection for producer, when it waits for connection, default value: 200ms
+spring.nsq.max-wait-timeout=200
+
+# Specify min number of idle connection number per topic in producer's connection pool, default value: 2
+spring.nsq.min-idle=2
+
+# default value: 3
+spring.nsq.publish-retry-times=3
+
+# 与nsqd 心跳检测间隔, default value: 30s, max value is: 60s
+spring.nsq.heartbeat-interval=30000
+
+# default value: 10min
+spring.nsq.connection-evict-interval=600000
+
+----

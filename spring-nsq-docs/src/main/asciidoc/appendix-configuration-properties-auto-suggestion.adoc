@@ -2,7 +2,7 @@
 [appendix]
 [[applicaton-properties-auto-suggestion]]
 == 配置选项自动提示
-* 在 `xx-config/pom.xml` 里添加 `spring-boot-configuration-processor` 依赖
+* 添加 `spring-boot-configuration-processor` 依赖
 
 [source,xml,indent=0,subs="verbatim,quotes,attributes"]
 ----

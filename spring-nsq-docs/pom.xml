@@ -51,7 +51,7 @@
                                 <docinfo>true</docinfo>
                                 <!-- Enable section numbering in the build using the attributes section. -->
                                 <sectnums>true</sectnums>
-                                <spring-nsq-version>${revision}</spring-nsq-version>
+                                <spring-nsq-version>${spring-nsq-dependencies.version}</spring-nsq-version>
                                 <spring-version>${spring.version}</spring-version>
                             </attributes>
                         </configuration>

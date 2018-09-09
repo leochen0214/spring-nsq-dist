@@ -3,13 +3,33 @@
 
 * 添加 `spring-nsq` maven依赖
 
+推荐使用spring-nsq提供的bom管理版本依赖
+
 [source,xml,indent=0,subs="verbatim,quotes,attributes"]
 ----
-<dependency>
-    <groupId>com.youzan.spring.nsq</groupId>
-    <artifactId>spring-nsq</artifactId>
-    <version>{spring-nsq-version}</version>
-</dependency>
+<properties>
+    <spring-nsq-dependencies.version>{spring-nsq-version}</spring-nsq-dependencies.version>
+</properties>
+
+<dependencies>
+    <dependency>
+        <groupId>com.youzan.spring.nsq</groupId>
+        <artifactId>spring-nsq</artifactId>
+    </dependency>
+</dependencies>
+
+<dependencyManagement>
+    <dependencies>
+	    <dependency>
+	        <!-- Import dependency management from spring-nsq -->
+	        <groupId>com.youzan.spring.nsq</groupId>
+            <artifactId>spring-nsq-dependencies</artifactId>
+	        <version>${spring-nsq-dependencies.version}</version>
+	        <type>pom</type>
+		    <scope>import</scope>
+	    </dependency>
+    </dependencies>
+</dependencyManagement>
 ----
 
 === Non spring-boot application
@@ -29,7 +49,6 @@ include::{code-examples}/AppConfig.java[tag=configuration]
 <dependency>
     <groupId>com.youzan.spring.nsq</groupId>
     <artifactId>nsq-spring-boot-starter</artifactId>
-    <version>{spring-nsq-version}</version>
 </dependency>
 ----
 
@@ -281,6 +300,59 @@ public interface NsqOperations {
 
 }
 ----
+
+== tracing
+
+=== 使用
+
+==== 添加如下依赖
+
+[source,xml,indent=0,subs="verbatim,quotes,attributes"]
+----
+<dependency>
+    <groupId>com.youzan.spring.nsq</groupId>
+    <artifactId>nsq-tracing-spring-boot-starter</artifactId>
+</dependency>
+----
+
+==== 应用日志会输出traceId, spanId
+
+* consumer-1(topic: JavaTesting-Ext , channel: default)
+
+[indent=0]
+----
+$ 2018-09-09 00:32:33.804  INFO [nsq-tracing-consumer-1,24ff9cf273b8227d,dd839f3e3abd5e3e,false] 21763 --- [t-Pool-Thread-1] com.example.nsqtracingconsumer1.Listener1  : listener1 person=name=jack, age=18, sex=male
+----
+
+* consumer-2(topic: JavaTesting-Ext , channel: test)
+
+[indent=0]
+----
+$ 2018-09-09 00:32:33.804  INFO [nsq-tracing-consumer-2,24ff9cf273b8227d,5e1e389392b12a75,false] 21716 --- [t-Pool-Thread-1] com.example.nsqtracingconsumer2.Listener2  : listener2 payload=name=jack, age=18, sex=male, headers={X-B3-Sampled=0, X-B3-TraceId=24ff9cf273b8227d, id=64d9bdb1-176a-769b-c26d-2d8bdc10d736, X-B3-SpanId=24ff9cf273b8227d, partitionId=0, timestamp=1536424353754}
+----
+
+=== 实现原理
+
+消息发送前设置trace header给Producer， 消息接收者提取出trace header，不同channel的消费者享有同一个
+traceId, 不同的spanId
+
+[source,properties,indent=0,subs="verbatim,attributes,macros"]
+----
+   Producer Tracer                                    Consumer Tracer
+\+------------------+                               \+------------------+
+| \+--------------+ |     \+-----------------+       | \+--------------+ |
+| | TraceContext |======>| Message Headers |========>| TraceContext | |
+| \+--------------+ |     \+-----------------+       | \+--------------+ |
+\+--------||--------+                               \+--------||--------+
+   start ||                                                 ||
+         \/                                          finish ||
+span(context).annotate("ms")                                \/
+             .address("ma", broker)          span(context).annotate("mr")
+                                                          .address("ma", broker)
+----
+
+more detail: https://github.com/openzipkin/openzipkin.github.io/blob/master/pages/instrumenting.md#message-tracing
+
 
 == Architecture
 

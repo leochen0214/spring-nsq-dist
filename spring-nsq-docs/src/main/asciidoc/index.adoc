@@ -1,4 +1,4 @@
-= spring-nsq 使用文档
+= spring-nsq reference
 Author: clong;
 :doctype: book
 :toc:
