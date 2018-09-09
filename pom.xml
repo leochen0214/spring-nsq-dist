@@ -26,6 +26,12 @@
         <main.basedir>${basedir}</main.basedir>
     </properties>
 
+    <scm>
+        <connection>scm:git:git@gitlab.qima-inc.com:chenlong/abc.git</connection>
+        <url>git@gitlab.qima-inc.com:chenlong/abc.git</url>
+        <developerConnection>scm:git:git@gitlab.qima-inc.com:chenlong/abc.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
     <build>
         <plugins>
