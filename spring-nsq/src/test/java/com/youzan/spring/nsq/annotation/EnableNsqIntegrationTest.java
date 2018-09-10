@@ -45,21 +45,4 @@ public class EnableNsqIntegrationTest {
   }
 
 
-  @Test
-  public void test1() {
-    ProducerFactory producerFactory = ctx.getBean(ProducerFactory.class);
-    ConsumerFactory consumerFactory = ctx.getBean(ConsumerFactory.class);
-
-    System.out.println(producerFactory);
-    System.out.println(consumerFactory);
-
-    Producer producer = producerFactory.createProducer();
-    try {
-      producer.publish(Message.create(new Topic(topic), "hello"));
-    } catch (NSQException e) {
-      e.printStackTrace();
-    }
-  }
-
-
 }
