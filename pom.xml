@@ -27,9 +27,9 @@
     </properties>
 
     <scm>
-        <connection>scm:git:git@gitlab.qima-inc.com:chenlong/abc.git</connection>
-        <url>git@gitlab.qima-inc.com:chenlong/abc.git</url>
-        <developerConnection>scm:git:git@gitlab.qima-inc.com:chenlong/abc.git</developerConnection>
+        <connection>scm:git:git@gitlab.qima-inc.com:chenlong/spring-nsq-dist.git</connection>
+        <url>http://gitlab.qima-inc.com/chenlong/spring-nsq-dist</url>
+        <developerConnection>scm:git:git@gitlab.qima-inc.com:chenlong/spring-nsq-dist.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 

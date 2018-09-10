@@ -50,3 +50,6 @@ data
 
 .flattened-pom.xml
 */.flattened-pom.xml
+
+*.releaseBackup
+*/*.releaseBackup
