@@ -3,5 +3,5 @@
 ```jshelllanguage
 mvn release:prepare
 
-mvn release:perform -DuseReleaseProfile=false
+mvn release:perform -DuseReleaseProfile=false -Darguments="-DskipTests"
 ```
