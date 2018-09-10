@@ -36,8 +36,8 @@ Author: clong;
 
 :dc-youzan-root: http://asciidoc.qima-inc.com/docs
 :gitlab-repo: http://gitlab.qima-inc.com
-:spring-nsq-docs: {dc-youzan-root}/spring-nsq/{spring-nsq-version}
-:spring-nsq-docs-current: {dc-youzan-root}/spring-nsq/current
+:spring-nsq-docs: {dc-youzan-root}/spring-nsq/{spring-nsq-version}/reference
+:spring-nsq-docs-current: {dc-youzan-root}/spring-nsq/current/reference
 :gitlab-spring-nsq-repo: {gitlab-repo}/chenlong/spring-nsq-dist/tree/master/
 :code-examples: ../java/com/youzan/example
 
