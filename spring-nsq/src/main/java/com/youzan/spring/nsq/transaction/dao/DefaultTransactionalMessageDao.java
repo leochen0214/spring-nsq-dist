@@ -1,6 +1,6 @@
 package com.youzan.spring.nsq.transaction.dao;
 
-import com.youzan.spring.nsq.transaction.TransactionalMessage;
+import com.youzan.spring.nsq.transaction.domain.TransactionalMessage;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;

@@ -1,4 +1,4 @@
-package com.youzan.spring.nsq.support;
+package com.youzan.spring.nsq.transaction;
 
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;

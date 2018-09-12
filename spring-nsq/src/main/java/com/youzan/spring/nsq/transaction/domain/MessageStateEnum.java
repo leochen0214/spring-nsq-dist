@@ -1,4 +1,4 @@
-package com.youzan.spring.nsq.transaction;
+package com.youzan.spring.nsq.transaction.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

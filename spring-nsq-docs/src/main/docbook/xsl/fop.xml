@@ -1,10 +1,10 @@
 <fop version="1.0" encoding="UTF-8">
 
     <!-- Base URL for resolving relative URLs -->
-    <base>./</base>
+    <!--<base>../</base>-->
 
     <!-- Font Base URL for resolving relative font URLs -->
-    <font-base>./</font-base>
+    <font-base>../</font-base>
 
 
     <renderers>

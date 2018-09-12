@@ -1,4 +1,4 @@
-package com.youzan.spring.nsq.transaction;
+package com.youzan.spring.nsq.transaction.domain;
 
 import java.util.Date;
 
