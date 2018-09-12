@@ -8,7 +8,7 @@ import org.springframework.util.StringUtils;
  * @author: clong
  * @date: 2018-09-11
  */
-public class EnvironmentComponent implements EnvironmentAware {
+public class CurrentEnvironment implements EnvironmentAware {
 
   /**
    * sc环境的变量名称

@@ -32,16 +32,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LocalTransactionNsqTemplate {
 
-  private final EnvironmentComponent environmentComponent;
+  private final CurrentEnvironment currentEnvironment;
   private final NsqTemplate nsqTemplate;
   private final TransactionalMessageDao transactionalMessageDao;
   private final TransactionTemplate template;
 
   public LocalTransactionNsqTemplate(PlatformTransactionManager transactionManager,
-                                     EnvironmentComponent environmentComponent,
+                                     CurrentEnvironment currentEnvironment,
                                      NsqTemplate nsqTemplate,
                                      TransactionalMessageDao transactionalMessageDao) {
-    this.environmentComponent = environmentComponent;
+    this.currentEnvironment = currentEnvironment;
     this.nsqTemplate = nsqTemplate;
     this.transactionalMessageDao = transactionalMessageDao;
     this.template = createTransactionTemplate(transactionManager);
@@ -54,7 +54,7 @@ public class LocalTransactionNsqTemplate {
         .businessKey(context.getBusinessKey())
         .eventType(context.getEventType())
         .shardingId(context.getShardingId())
-        .env(environmentComponent.currentEnv())
+        .env(currentEnvironment.currentEnv())
         .payload(payload)
         .state(MessageStateEnum.CREATED.getCode())
         .build();
