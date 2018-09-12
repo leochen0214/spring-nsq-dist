@@ -5,6 +5,7 @@ import com.youzan.spring.nsq.transaction.domain.TransactionalMessage;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.util.StringUtils;
 
 import java.sql.PreparedStatement;
 
@@ -38,7 +39,9 @@ public class DefaultTransactionalMessageDao implements TransactionalMessageDao {
 
 
   public void setTableName(String tableName) {
-    this.tableName = tableName;
+    if (StringUtils.hasText(tableName)) {
+      this.tableName = tableName;
+    }
   }
 
   @Override
