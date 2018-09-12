@@ -19,6 +19,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import javax.sql.DataSource;
+
 /**
  * @author: clong
  * @date: 2018-09-12
@@ -37,6 +39,12 @@ public class LocalTransactionNsqTemplateAutoConfiguration {
     return new CurrentEnvironment();
   }
 
+
+  @Bean
+  @ConditionalOnMissingBean
+  public JdbcTemplate jdbcTemplate(@Autowired DataSource dataSource){
+    return new JdbcTemplate(dataSource);
+  }
 
   @Bean
   @ConditionalOnMissingBean
