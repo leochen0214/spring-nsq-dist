@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  * @date: 2018-09-11
  */
 @Slf4j
-public class LocalTransactionNsqTemplate {
+public class LocalTransactionNsqTemplate implements TransactionalNsqTemplate {
 
   private final CurrentEnvironment currentEnvironment;
   private final NsqTemplate nsqTemplate;
@@ -48,6 +48,7 @@ public class LocalTransactionNsqTemplate {
   }
 
 
+  @Override
   public void send(String topic, MessageContext context) {
     String payload = getPayload(context);
     TransactionalMessage messageDO = TransactionalMessageBuilder.builder()

@@ -3,6 +3,7 @@ package com.youzan.spring.nsq.autoconfigure;
 import com.youzan.spring.nsq.core.impl.NsqTemplate;
 import com.youzan.spring.nsq.transaction.CurrentEnvironment;
 import com.youzan.spring.nsq.transaction.LocalTransactionNsqTemplate;
+import com.youzan.spring.nsq.transaction.TransactionalNsqTemplate;
 import com.youzan.spring.nsq.transaction.dao.DefaultTransactionalMessageDao;
 import com.youzan.spring.nsq.transaction.dao.TransactionalMessageDao;
 
@@ -50,7 +51,7 @@ public class LocalTransactionNsqTemplateAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  public LocalTransactionNsqTemplate localTransactionNsqTemplate(
+  public TransactionalNsqTemplate transactionalNsqTemplate(
       @Autowired PlatformTransactionManager transactionManager,
       @Autowired CurrentEnvironment currentEnvironment,
       @Autowired TransactionalMessageDao transactionalMessageDao,
