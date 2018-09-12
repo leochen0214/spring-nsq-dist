@@ -1,4 +1,5 @@
 # Auto Configuration
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.youzan.spring.nsq.autoconfigure.SpringNsqAutoConfiguration
+com.youzan.spring.nsq.autoconfigure.SpringNsqAutoConfiguration,\
+  com.youzan.spring.nsq.autoconfigure.LocalTransactionNsqTemplateAutoConfiguration
 
