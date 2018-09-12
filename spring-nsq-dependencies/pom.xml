@@ -26,6 +26,7 @@
         <spring-boot.version>2.0.4.RELEASE</spring-boot.version>
         <nsq-client.version>2.4.2.2-RELEASE</nsq-client.version>
         <fastjson.version>1.2.49</fastjson.version>
+        <job-client.version>1.0.5.RELEASE</job-client.version>
         <spring-nsq-dependencies.version>1.0.1-SNAPSHOT</spring-nsq-dependencies.version>
     </properties>
 
@@ -52,6 +53,12 @@
             <dependency>
                 <groupId>com.youzan.spring.nsq</groupId>
                 <artifactId>nsq-tracing-spring-boot-starter</artifactId>
+                <version>${spring-nsq-dependencies.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.youzan.spring.nsq</groupId>
+                <artifactId>spring-nsq-compensation-job</artifactId>
                 <version>${spring-nsq-dependencies.version}</version>
             </dependency>
 
@@ -113,6 +120,12 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.youzan.payment.middleware</groupId>
+                <artifactId>job-client</artifactId>
+                <version>${job-client.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

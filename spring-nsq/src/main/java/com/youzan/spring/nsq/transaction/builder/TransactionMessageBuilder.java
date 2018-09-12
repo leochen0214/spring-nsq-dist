@@ -1,12 +1,12 @@
 package com.youzan.spring.nsq.transaction.builder;
 
-import com.youzan.spring.nsq.transaction.domain.TransactionalMessage;
+import com.youzan.spring.nsq.transaction.domain.TransactionMessage;
 
 /**
  * @author: clong
  * @date: 2018-09-12
  */
-public class TransactionalMessageBuilder {
+public class TransactionMessageBuilder {
 
   private String businessKey;
   private String eventType;
@@ -16,16 +16,16 @@ public class TransactionalMessageBuilder {
   private String payload;
 
 
-  private TransactionalMessageBuilder() {
+  private TransactionMessageBuilder() {
 
   }
 
-  public static TransactionalMessageBuilder builder() {
-    return new TransactionalMessageBuilder();
+  public static TransactionMessageBuilder builder() {
+    return new TransactionMessageBuilder();
   }
 
-  public TransactionalMessage build(){
-    TransactionalMessage result = new TransactionalMessage();
+  public TransactionMessage build(){
+    TransactionMessage result = new TransactionMessage();
     result.setShardingId(shardingId);
     result.setBusinessKey(businessKey);
     result.setEventType(eventType);
@@ -36,33 +36,33 @@ public class TransactionalMessageBuilder {
     return result;
   }
 
-  public TransactionalMessageBuilder payload(String payload) {
+  public TransactionMessageBuilder payload(String payload) {
     this.payload = payload;
     return this;
   }
 
 
-  public TransactionalMessageBuilder businessKey(String businessKey) {
+  public TransactionMessageBuilder businessKey(String businessKey) {
     this.businessKey = businessKey;
     return this;
   }
 
-  public TransactionalMessageBuilder eventType(String eventType) {
+  public TransactionMessageBuilder eventType(String eventType) {
     this.eventType = eventType;
     return this;
   }
 
-  public TransactionalMessageBuilder env(String env) {
+  public TransactionMessageBuilder env(String env) {
     this.env = env;
     return this;
   }
 
-  public TransactionalMessageBuilder shardingId(int shardingId) {
+  public TransactionMessageBuilder shardingId(int shardingId) {
     this.shardingId = shardingId;
     return this;
   }
 
-  public TransactionalMessageBuilder state(Integer state) {
+  public TransactionMessageBuilder state(Integer state) {
     this.state = state;
     return this;
   }

@@ -13,6 +13,7 @@
         <module>spring-nsq-spring-boot-starter</module>
         <module>brave-instrumentation-nsq-client</module>
         <module>nsq-tracing-spring-boot-starter</module>
+        <module>spring-nsq-compensation-job</module>
         <module>spring-nsq-docs</module>
     </modules>
 

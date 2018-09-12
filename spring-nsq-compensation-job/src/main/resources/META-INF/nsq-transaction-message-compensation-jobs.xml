@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:job="http://www.youzan.com/schema/job"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.youzan.com/schema/job http://www.youzan.com/schema/job/job.xsd">
+
+    <import resource="classpath*:META-INF/jobs-base.xml"/>
+
+
+    <!--
+     1.        Seconds
+     2.        Minutes
+     3.        Hours
+     4.        Day-of-Month
+     5.        Month
+     6.        Day-of-Week
+     7.        Year (可选字段)
+     -->
+    <job:dataflow id="messagePublishCompensationJob"
+                  class="com.youzan.spring.nsq.compensation.job.MessagePublishCompensationJob"
+                  cron="*/5 * * * * ?"
+                  sharding-total-count="12"
+                  job-parameter="1"
+                  disabled="true"
+                  overwrite="true"
+                  core-pool-size="3"
+                  max-pool-size="20"
+                  keep-alive-seconds="60"
+                  queue-capacity="100"/>
+
+    <job:dataflow id="messageTableCleanJob"
+                  class="com.youzan.spring.nsq.compensation.job.MessageTableCleanJob"
+                  cron="*/5 * * * * ?"
+                  sharding-total-count="12"
+                  job-parameter="1"
+                  disabled="true"
+                  overwrite="true"
+                  core-pool-size="3"
+                  max-pool-size="20"
+                  keep-alive-seconds="60"
+                  queue-capacity="100"/>
+
+
+</beans>

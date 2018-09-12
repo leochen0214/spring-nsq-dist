@@ -5,11 +5,11 @@ import com.youzan.nsq.client.entity.Topic;
 import com.youzan.nsq.client.exception.NSQException;
 import com.youzan.spring.nsq.core.impl.NsqTemplate;
 import com.youzan.spring.nsq.support.converter.JsonMessageConverter;
-import com.youzan.spring.nsq.transaction.builder.TransactionalMessageBuilder;
+import com.youzan.spring.nsq.transaction.builder.TransactionMessageBuilder;
 import com.youzan.spring.nsq.transaction.dao.TransactionalMessageDao;
 import com.youzan.spring.nsq.transaction.domain.MessageContext;
 import com.youzan.spring.nsq.transaction.domain.MessageStateEnum;
-import com.youzan.spring.nsq.transaction.domain.TransactionalMessage;
+import com.youzan.spring.nsq.transaction.domain.TransactionMessage;
 
 import com.alibaba.fastjson.JSON;
 
@@ -51,7 +51,7 @@ public class LocalTransactionNsqTemplate implements TransactionalNsqTemplate {
   @Override
   public void send(String topic, MessageContext context) {
     String payload = getPayload(context);
-    TransactionalMessage messageDO = TransactionalMessageBuilder.builder()
+    TransactionMessage messageDO = TransactionMessageBuilder.builder()
         .businessKey(context.getBusinessKey())
         .eventType(context.getEventType())
         .shardingId(context.getShardingId())
@@ -89,7 +89,7 @@ public class LocalTransactionNsqTemplate implements TransactionalNsqTemplate {
     return template;
   }
 
-  private void doSend(String eventType, String topic, String msg, TransactionalMessage messageDO) {
+  private void doSend(String eventType, String topic, String msg, TransactionMessage messageDO) {
     log.info("开始发送{}消息, message={}", eventType, msg);
     try {
       Message message = Message.create(new Topic(topic), msg);

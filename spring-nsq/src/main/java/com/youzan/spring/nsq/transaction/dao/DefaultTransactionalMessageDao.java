@@ -1,6 +1,6 @@
 package com.youzan.spring.nsq.transaction.dao;
 
-import com.youzan.spring.nsq.transaction.domain.TransactionalMessage;
+import com.youzan.spring.nsq.transaction.domain.TransactionMessage;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -45,7 +45,7 @@ public class DefaultTransactionalMessageDao implements TransactionalMessageDao {
   }
 
   @Override
-  public int insert(TransactionalMessage message) {
+  public int insert(TransactionMessage message) {
     String sql = getInsertSql();
     KeyHolder keyHolder = new GeneratedKeyHolder();
 

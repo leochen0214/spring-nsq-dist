@@ -1,6 +1,6 @@
 package com.youzan.spring.nsq.transaction.dao;
 
-import com.youzan.spring.nsq.transaction.domain.TransactionalMessage;
+import com.youzan.spring.nsq.transaction.domain.TransactionMessage;
 
 
 /**
@@ -15,7 +15,7 @@ public interface TransactionalMessageDao {
    * @param message message entity
    * @return weather insert success
    */
-  int insert(TransactionalMessage message);
+  int insert(TransactionMessage message);
 
   /**
    * update message state
