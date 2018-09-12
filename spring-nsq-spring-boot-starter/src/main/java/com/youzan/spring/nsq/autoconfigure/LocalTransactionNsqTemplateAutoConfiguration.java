@@ -32,7 +32,7 @@ public class LocalTransactionNsqTemplateAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  public CurrentEnvironment environmentComponent() {
+  public CurrentEnvironment currentEnvironment() {
     return new CurrentEnvironment();
   }
 
