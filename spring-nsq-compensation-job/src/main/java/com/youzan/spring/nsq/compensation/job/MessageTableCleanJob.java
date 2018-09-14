@@ -1,15 +1,18 @@
 package com.youzan.spring.nsq.compensation.job;
 
-import com.youzan.spring.nsq.transaction.CurrentEnvironment;
 import com.youzan.spring.nsq.transaction.dao.TransactionalMessageDao;
-import com.youzan.spring.nsq.transaction.domain.TransactionMessage;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
-import com.dangdang.ddframe.job.api.dataflow.DataflowJob;
+import com.dangdang.ddframe.job.api.simple.SimpleJob;
 
-import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 import javax.annotation.Resource;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * deletes has already published success message from message table.
@@ -17,23 +20,31 @@ import javax.annotation.Resource;
  * @author: clong
  * @date: 2018-09-12
  */
-public class MessageTableCleanJob implements DataflowJob<TransactionMessage> {
-
-  @Resource
-  private CurrentEnvironment currentEnvironment;
+@Slf4j
+public class MessageTableCleanJob implements SimpleJob {
 
   @Resource
   private TransactionalMessageDao transactionalMessageDao;
 
 
-  @Override
-  public List<TransactionMessage> fetchData(ShardingContext shardingContext) {
+  @Value("${message.remain.days: 30}")
+  private int remainDays;
 
-    return null;
+  @Value("${message.delete.limit.size: 200}")
+  private int fetchSize;
+
+
+  @Override
+  public void execute(ShardingContext shardingContext) {
+    Date date = toDate(ZonedDateTime.now().minusDays(remainDays));
+
+    int rows = transactionalMessageDao.batchDeleteOfNonSharding(date, fetchSize);
+
+    log.info("delete {} rows messages", rows);
   }
 
-  @Override
-  public void processData(ShardingContext shardingContext, List<TransactionMessage> list) {
 
+  private static Date toDate(ZonedDateTime zdt) {
+    return Date.from(zdt.toInstant());
   }
 }

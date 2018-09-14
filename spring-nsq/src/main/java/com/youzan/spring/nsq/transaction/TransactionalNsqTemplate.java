@@ -10,7 +10,7 @@ import com.youzan.spring.nsq.transaction.domain.MessageContext;
 public interface TransactionalNsqTemplate {
 
   /**
-   * send transactional message, if message publish failed, then we can publish it later.
+   * send transactional message, if message send failed, then we can send it later.
    *
    * @param topic   message topic
    * @param context message context, use @{link MessageContextBuilder to build it}

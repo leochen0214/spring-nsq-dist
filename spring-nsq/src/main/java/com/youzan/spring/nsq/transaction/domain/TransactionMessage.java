@@ -56,5 +56,10 @@ public class TransactionMessage {
    */
   private String payload;
 
+  /**
+   * 消息topic
+   */
+  private String topic;
+
 
 }

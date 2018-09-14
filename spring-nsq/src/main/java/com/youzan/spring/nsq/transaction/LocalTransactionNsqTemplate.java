@@ -57,6 +57,7 @@ public class LocalTransactionNsqTemplate implements TransactionalNsqTemplate {
         .shardingId(context.getShardingId())
         .env(currentEnvironment.currentEnv())
         .payload(payload)
+        .topic(topic)
         .state(MessageStateEnum.CREATED.getCode())
         .build();
 

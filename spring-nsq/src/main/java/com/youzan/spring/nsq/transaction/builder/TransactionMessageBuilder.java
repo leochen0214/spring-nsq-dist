@@ -14,6 +14,7 @@ public class TransactionMessageBuilder {
   private Integer state;
   private String env;
   private String payload;
+  private String topic;
 
 
   private TransactionMessageBuilder() {
@@ -32,8 +33,14 @@ public class TransactionMessageBuilder {
     result.setEnv(env);
     result.setState(state);
     result.setPayload(payload);
+    result.setTopic(topic);
 
     return result;
+  }
+
+  public TransactionMessageBuilder topic(String topic) {
+    this.topic = topic;
+    return this;
   }
 
   public TransactionMessageBuilder payload(String payload) {
