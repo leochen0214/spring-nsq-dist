@@ -23,7 +23,7 @@ import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * search send failed messages, and send again
+ * search sending failed messages, and send it again.
  *
  * @author: clong
  * @date: 2018-09-12
