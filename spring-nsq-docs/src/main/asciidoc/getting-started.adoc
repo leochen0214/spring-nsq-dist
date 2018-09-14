@@ -48,7 +48,7 @@ include::{code-examples}/AppConfig.java[tag=configuration]
 ----
 <dependency>
     <groupId>com.youzan.spring.nsq</groupId>
-    <artifactId>nsq-spring-boot-starter</artifactId>
+    <artifactId>spring-nsq-spring-boot-starter</artifactId>
 </dependency>
 ----
 
