@@ -7,7 +7,7 @@ import com.youzan.spring.nsq.transaction.domain.MessageContext;
  * @date: 2018-09-12
  * @see com.youzan.spring.nsq.transaction.builder.MessageContextBuilder
  */
-public interface TransactionalNsqTemplate {
+public interface TransactionNsqTemplate {
 
   /**
    * send transactional message, if message send failed, then we can send it later.

@@ -10,7 +10,7 @@ import java.util.List;
  * @author: clong
  * @date: 2018-09-11
  */
-public interface TransactionalMessageDao {
+public interface TransactionMessageDao {
 
   /**
    * insert into message table

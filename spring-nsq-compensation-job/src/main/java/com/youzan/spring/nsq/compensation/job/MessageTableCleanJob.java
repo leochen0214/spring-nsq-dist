@@ -1,6 +1,6 @@
 package com.youzan.spring.nsq.compensation.job;
 
-import com.youzan.spring.nsq.transaction.dao.TransactionalMessageDao;
+import com.youzan.spring.nsq.transaction.dao.TransactionMessageDao;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MessageTableCleanJob implements SimpleJob {
 
   @Resource
-  private TransactionalMessageDao transactionalMessageDao;
+  private TransactionMessageDao transactionMessageDao;
 
 
   @Value("${message.remain.days: 30}")
@@ -38,7 +38,7 @@ public class MessageTableCleanJob implements SimpleJob {
   public void execute(ShardingContext shardingContext) {
     Date date = toDate(ZonedDateTime.now().minusDays(remainDays));
 
-    int rows = transactionalMessageDao.batchDeleteOfNonSharding(date, fetchSize);
+    int rows = transactionMessageDao.batchDeleteOfNonSharding(date, fetchSize);
 
     log.info("delete {} rows messages", rows);
   }

@@ -3,9 +3,9 @@ package com.youzan.spring.nsq.autoconfigure;
 import com.youzan.spring.nsq.core.impl.NsqTemplate;
 import com.youzan.spring.nsq.transaction.CurrentEnvironment;
 import com.youzan.spring.nsq.transaction.LocalTransactionNsqTemplate;
-import com.youzan.spring.nsq.transaction.TransactionalNsqTemplate;
-import com.youzan.spring.nsq.transaction.dao.DefaultTransactionalMessageDao;
-import com.youzan.spring.nsq.transaction.dao.TransactionalMessageDao;
+import com.youzan.spring.nsq.transaction.TransactionNsqTemplate;
+import com.youzan.spring.nsq.transaction.dao.DefaultTransactionMessageDao;
+import com.youzan.spring.nsq.transaction.dao.TransactionMessageDao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,10 +48,10 @@ public class LocalTransactionNsqTemplateAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  public TransactionalMessageDao transactionalMessageDao(@Autowired JdbcTemplate jdbcTemplate,
-                                                         @Value("${spring.nsq.transaction.table-name}") String tableName) {
-    DefaultTransactionalMessageDao transactionalMessageDao =
-        new DefaultTransactionalMessageDao(jdbcTemplate);
+  public TransactionMessageDao transactionMessageDao(@Autowired JdbcTemplate jdbcTemplate,
+                                                     @Value("${spring.nsq.transaction.table-name}") String tableName) {
+    DefaultTransactionMessageDao transactionalMessageDao =
+        new DefaultTransactionMessageDao(jdbcTemplate);
     transactionalMessageDao.setTableName(tableName);
 
     return transactionalMessageDao;
@@ -59,13 +59,13 @@ public class LocalTransactionNsqTemplateAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  public TransactionalNsqTemplate transactionalNsqTemplate(
+  public TransactionNsqTemplate transactionNsqTemplate(
       @Autowired PlatformTransactionManager transactionManager,
       @Autowired CurrentEnvironment currentEnvironment,
-      @Autowired TransactionalMessageDao transactionalMessageDao,
+      @Autowired TransactionMessageDao transactionMessageDao,
       @Autowired NsqTemplate nsqTemplate) {
     return new LocalTransactionNsqTemplate(transactionManager, currentEnvironment,
-                                           nsqTemplate, transactionalMessageDao);
+                                           nsqTemplate, transactionMessageDao);
   }
 
 

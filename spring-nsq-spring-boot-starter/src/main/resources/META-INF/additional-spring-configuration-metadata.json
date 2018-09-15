@@ -4,7 +4,7 @@
       "name": "spring.nsq.transaction.table-name",
       "type": "java.lang.String",
       "description": "本地事务性消息表名称",
-      "defaultValue": "nsq_transactional_message"
+      "defaultValue": "nsq_transaction_message"
     }
   ]
 }

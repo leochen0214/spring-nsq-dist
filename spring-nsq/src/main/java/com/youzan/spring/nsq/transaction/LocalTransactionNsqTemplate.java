@@ -6,7 +6,7 @@ import com.youzan.nsq.client.exception.NSQException;
 import com.youzan.spring.nsq.core.impl.NsqTemplate;
 import com.youzan.spring.nsq.support.converter.JsonMessageConverter;
 import com.youzan.spring.nsq.transaction.builder.TransactionMessageBuilder;
-import com.youzan.spring.nsq.transaction.dao.TransactionalMessageDao;
+import com.youzan.spring.nsq.transaction.dao.TransactionMessageDao;
 import com.youzan.spring.nsq.transaction.domain.MessageContext;
 import com.youzan.spring.nsq.transaction.domain.MessageStateEnum;
 import com.youzan.spring.nsq.transaction.domain.TransactionMessage;
@@ -30,20 +30,20 @@ import lombok.extern.slf4j.Slf4j;
  * @date: 2018-09-11
  */
 @Slf4j
-public class LocalTransactionNsqTemplate implements TransactionalNsqTemplate {
+public class LocalTransactionNsqTemplate implements TransactionNsqTemplate {
 
   private final CurrentEnvironment currentEnvironment;
   private final NsqTemplate nsqTemplate;
-  private final TransactionalMessageDao transactionalMessageDao;
-  private final TransactionTemplate template;
+  private final TransactionMessageDao transactionMessageDao;
+  private TransactionTemplate template;
 
   public LocalTransactionNsqTemplate(PlatformTransactionManager transactionManager,
                                      CurrentEnvironment currentEnvironment,
                                      NsqTemplate nsqTemplate,
-                                     TransactionalMessageDao transactionalMessageDao) {
+                                     TransactionMessageDao transactionMessageDao) {
     this.currentEnvironment = currentEnvironment;
     this.nsqTemplate = nsqTemplate;
-    this.transactionalMessageDao = transactionalMessageDao;
+    this.transactionMessageDao = transactionMessageDao;
     this.template = createTransactionTemplate(transactionManager);
   }
 
@@ -64,7 +64,7 @@ public class LocalTransactionNsqTemplate implements TransactionalNsqTemplate {
     boolean success = false;
     try {
       success = template.execute(status -> {
-        int rows = transactionalMessageDao.insert(messageDO);
+        int rows = transactionMessageDao.insert(messageDO);
         return rows == 1;
       });
     } catch (DuplicateKeyException e) {
@@ -98,8 +98,8 @@ public class LocalTransactionNsqTemplate implements TransactionalNsqTemplate {
       nsqTemplate.execute(producer -> producer.publish(message));
 
       template.execute(status -> {
-        int rows = transactionalMessageDao.updateState(messageDO.getId(), messageDO.getShardingId(),
-                                                       MessageStateEnum.PUBLISHED.getCode());
+        int rows = transactionMessageDao.updateState(messageDO.getId(), messageDO.getShardingId(),
+                                                     MessageStateEnum.PUBLISHED.getCode());
         return rows == 1;
       });
       log.info("结束发送{}消息, message={}", eventType, msg);

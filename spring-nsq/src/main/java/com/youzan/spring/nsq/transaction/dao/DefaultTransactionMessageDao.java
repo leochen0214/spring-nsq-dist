@@ -20,9 +20,9 @@ import lombok.extern.slf4j.Slf4j;
  * @date: 2018-09-11
  */
 @Slf4j
-public class DefaultTransactionalMessageDao implements TransactionalMessageDao {
+public class DefaultTransactionMessageDao implements TransactionMessageDao {
 
-  private static final String DEFAULT_TABLE_NAME = "nsq_transactional_message";
+  private static final String DEFAULT_TABLE_NAME = "nsq_transaction_message";
 
   private static final int MAX_DELETE_SIZE = 200;
 
@@ -54,7 +54,7 @@ public class DefaultTransactionalMessageDao implements TransactionalMessageDao {
    */
   private String tableName = DEFAULT_TABLE_NAME;
 
-  public DefaultTransactionalMessageDao(JdbcTemplate jdbcTemplate) {
+  public DefaultTransactionMessageDao(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
   }
 

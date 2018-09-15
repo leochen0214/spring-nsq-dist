@@ -4,7 +4,7 @@ import com.youzan.nsq.client.entity.Message;
 import com.youzan.nsq.client.entity.Topic;
 import com.youzan.spring.nsq.core.NsqOperations;
 import com.youzan.spring.nsq.transaction.CurrentEnvironment;
-import com.youzan.spring.nsq.transaction.dao.TransactionalMessageDao;
+import com.youzan.spring.nsq.transaction.dao.TransactionMessageDao;
 import com.youzan.spring.nsq.transaction.domain.MessageStateEnum;
 import com.youzan.spring.nsq.transaction.domain.TransactionMessage;
 
@@ -35,7 +35,7 @@ public class MessagePublishCompensationJob implements DataflowJob<TransactionMes
   private CurrentEnvironment currentEnvironment;
 
   @Resource
-  private TransactionalMessageDao transactionalMessageDao;
+  private TransactionMessageDao transactionMessageDao;
 
   @Resource
   private NsqOperations nsqTemplate;
@@ -52,7 +52,7 @@ public class MessagePublishCompensationJob implements DataflowJob<TransactionMes
     String env = currentEnvironment.currentEnv();
     Date from = toDate(ZonedDateTime.now().minusDays(agoDays));
 
-    return transactionalMessageDao.queryPublishFailedMessagesOfNonSharding(from, fetchSize, env);
+    return transactionMessageDao.queryPublishFailedMessagesOfNonSharding(from, fetchSize, env);
   }
 
   @Override
@@ -117,8 +117,8 @@ public class MessagePublishCompensationJob implements DataflowJob<TransactionMes
 
   private boolean doUpdateMessageState(TransactionMessage message) {
     try {
-      transactionalMessageDao.updateState(message.getId(), message.getShardingId(),
-                                          MessageStateEnum.PUBLISHED.getCode());
+      transactionMessageDao.updateState(message.getId(), message.getShardingId(),
+                                        MessageStateEnum.PUBLISHED.getCode());
       return true;
     } catch (Exception e) {
       log.warn("此次更新消息表状态为已发送失败, message={}", message, e);
