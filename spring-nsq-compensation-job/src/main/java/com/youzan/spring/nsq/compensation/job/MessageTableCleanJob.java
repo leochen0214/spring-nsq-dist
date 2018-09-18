@@ -22,15 +22,16 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class MessageTableCleanJob implements SimpleJob {
+  private static final String PREFIX = "[事务性消息清理任务]";
 
   @Resource
   private TransactionMessageDao transactionMessageDao;
 
 
-  @Value("${message.remain.days: 30}")
+  @Value("${spring.nsq.transaction.message.remain-days: 30}")
   private int remainDays;
 
-  @Value("${message.delete.limit.size: 200}")
+  @Value("${spring.nsq.transaction.message.delete-limit-size: 200}")
   private int fetchSize;
 
 
@@ -40,7 +41,7 @@ public class MessageTableCleanJob implements SimpleJob {
 
     int rows = transactionMessageDao.batchDeleteOfNonSharding(date, fetchSize);
 
-    log.info("delete {} rows messages", rows);
+    log.info("{} 清理{}天前数据, 本次清理共删除 {} 条记录", PREFIX, rows);
   }
 
 

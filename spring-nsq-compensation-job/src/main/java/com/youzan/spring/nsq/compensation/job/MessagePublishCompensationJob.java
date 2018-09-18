@@ -31,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MessagePublishCompensationJob implements DataflowJob<TransactionMessage> {
 
+  private static final String PREFIX = "[事务性消息补偿任务]";
+
   @Resource
   private CurrentEnvironment currentEnvironment;
 
@@ -40,29 +42,30 @@ public class MessagePublishCompensationJob implements DataflowJob<TransactionMes
   @Resource
   private NsqOperations nsqTemplate;
 
-  @Value("${message.fetch.days: 7}")
+  @Value("${spring.nsq.transaction.message.fetch-days: 7}")
   private int agoDays;
 
-  @Value("${message.fetch.size: 200}")
+  @Value("${spring.nsq.transaction.message.fetch-size: 200}")
   private int fetchSize;
 
 
   @Override
   public List<TransactionMessage> fetchData(ShardingContext ctx) {
+    log.debug("{}消息重发补偿job开始工作, ctx={}", PREFIX, ctx);
     String env = currentEnvironment.currentEnv();
     Date from = toDate(ZonedDateTime.now().minusDays(agoDays));
 
-    return transactionMessageDao.queryPublishFailedMessagesOfNonSharding(from, fetchSize, env);
+    List<TransactionMessage> messages =
+        transactionMessageDao.queryPublishFailedMessagesOfNonSharding(from, fetchSize, env);
+    if (messages.isEmpty()) {
+      log.info("{}此次调度没有查询到{}天前需要重发的消息", PREFIX, agoDays);
+    }
+    return messages;
   }
 
   @Override
   public void processData(ShardingContext shardingContext, List<TransactionMessage> messages) {
-    if (messages.isEmpty()) {
-      log.info("此次调度没有查询到需要重发的消息, agoDays={}", agoDays);
-      return;
-    }
-
-    log.info("此次调度查询到需要重发的消息共有{}条", messages.size());
+    log.info("{}此次调度查询到需要重发的消息共有{}条", PREFIX, messages.size());
 
     int successCount = 0;
     for (TransactionMessage message : messages) {
@@ -75,8 +78,8 @@ public class MessagePublishCompensationJob implements DataflowJob<TransactionMes
         }
       }
     }
-    log.info("此次调度查询到需要重发的{}条消息处理完毕, 消息重发成功并且更新消息状态成功的共{}条",
-             messages.size(), successCount);
+    log.info("{}此次调度查询到需要重发的{}条消息处理完毕, 消息重发成功并且更新消息状态成功的共{}条",
+             PREFIX, messages.size(), successCount);
   }
 
   private static Date toDate(ZonedDateTime zdt) {
@@ -109,7 +112,7 @@ public class MessagePublishCompensationJob implements DataflowJob<TransactionMes
       nsqTemplate.send(nsqMessage);
       return true;
     } catch (Exception e) {
-      log.warn("此次补偿消息重发失败, message={}", message, e);
+      log.warn("{}此次补偿消息重发失败, message={}", PREFIX, message, e);
     }
     return false;
   }
@@ -121,7 +124,7 @@ public class MessagePublishCompensationJob implements DataflowJob<TransactionMes
                                         MessageStateEnum.PUBLISHED.getCode());
       return true;
     } catch (Exception e) {
-      log.warn("此次更新消息表状态为已发送失败, message={}", message, e);
+      log.warn("{}此次更新消息表状态为已发送失败, message={}", PREFIX, message, e);
     }
     return false;
   }
