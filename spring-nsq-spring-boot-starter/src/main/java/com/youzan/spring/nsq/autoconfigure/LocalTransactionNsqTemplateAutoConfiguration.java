@@ -8,12 +8,12 @@ import com.youzan.spring.nsq.transaction.dao.DefaultTransactionMessageDao;
 import com.youzan.spring.nsq.transaction.dao.TransactionMessageDao;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,7 +30,14 @@ import javax.sql.DataSource;
 @AutoConfigureAfter({SpringNsqAutoConfiguration.class,
                      DataSourceTransactionManagerAutoConfiguration.class,
                      JdbcTemplateAutoConfiguration.class})
+@EnableConfigurationProperties(TransactionNsqProperties.class)
 public class LocalTransactionNsqTemplateAutoConfiguration {
+
+  private final TransactionNsqProperties properties;
+
+  public LocalTransactionNsqTemplateAutoConfiguration(TransactionNsqProperties properties) {
+    this.properties = properties;
+  }
 
 
   @Bean
@@ -48,11 +55,10 @@ public class LocalTransactionNsqTemplateAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  public TransactionMessageDao transactionMessageDao(@Autowired JdbcTemplate jdbcTemplate,
-                                                     @Value("${spring.nsq.transaction.table-name}") String tableName) {
+  public TransactionMessageDao transactionMessageDao(@Autowired JdbcTemplate jdbcTemplate) {
     DefaultTransactionMessageDao transactionalMessageDao =
         new DefaultTransactionMessageDao(jdbcTemplate);
-    transactionalMessageDao.setTableName(tableName);
+    transactionalMessageDao.setTableName(properties.getTableName());
 
     return transactionalMessageDao;
   }
