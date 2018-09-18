@@ -50,6 +50,10 @@ public class LocalTransactionNsqTemplate implements TransactionNsqTemplate {
 
   @Override
   public void send(String topic, MessageContext context) {
+    if (!TransactionSynchronizationManager.isActualTransactionActive()) {
+      throw new IllegalStateException("当前线程上无绑定事物，请确保在开启了事物中的方法中调用此方法");
+    }
+
     String payload = getPayload(context);
     TransactionMessage messageDO = TransactionMessageBuilder.builder()
         .businessKey(context.getBusinessKey())
@@ -88,6 +92,10 @@ public class LocalTransactionNsqTemplate implements TransactionNsqTemplate {
     template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
 
     return template;
+  }
+
+  private boolean has(){
+    return TransactionSynchronizationManager.isActualTransactionActive();
   }
 
   private void doSend(String eventType, String topic, String msg, TransactionMessage messageDO) {
