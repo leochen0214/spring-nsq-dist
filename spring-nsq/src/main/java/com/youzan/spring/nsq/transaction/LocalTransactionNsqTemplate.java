@@ -94,10 +94,6 @@ public class LocalTransactionNsqTemplate implements TransactionNsqTemplate {
     return template;
   }
 
-  private boolean has(){
-    return TransactionSynchronizationManager.isActualTransactionActive();
-  }
-
   private void doSend(String eventType, String topic, String msg, TransactionMessage messageDO) {
     log.info("开始发送{}消息, message={}", eventType, msg);
     try {

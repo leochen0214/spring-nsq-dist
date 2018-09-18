@@ -94,12 +94,12 @@ public class MessagePublishCompensationJob implements DataflowJob<TransactionMes
     boolean sendSuccess = doSendNsqMessage(message);
     boolean updateSuccess = false;
     if (sendSuccess) {
-      log.info("补偿重发消息成功, message={}", message);
+      log.info("{}补偿重发消息成功, message={}", PREFIX, message);
       updateSuccess = doUpdateMessageState(message);
     }
 
     if (updateSuccess) {
-      log.info("此次更新消息表状态为已发送成功, message={}", message);
+      log.info("{}此次更新消息表状态为已发送成功, message={}", PREFIX, message);
     }
 
     return sendSuccess && updateSuccess;
