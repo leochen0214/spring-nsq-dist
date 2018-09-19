@@ -2,6 +2,8 @@ package com.youzan.spring.nsq.transaction.builder;
 
 import com.youzan.spring.nsq.transaction.domain.MessageContext;
 
+import java.util.Objects;
+
 /**
  * @author: clong
  * @date: 2018-09-12
@@ -29,6 +31,10 @@ public class MessageContextBuilder {
   }
 
   public MessageContext build() {
+    Objects.requireNonNull(payload, "payload can't be null");
+    Objects.requireNonNull(businessKey, "businessKey can't be null");
+    Objects.requireNonNull(eventType, "eventType can't be null");
+
     MessageContext context = new MessageContext();
     context.setPayload(payload);
     context.setBusinessKey(businessKey);
