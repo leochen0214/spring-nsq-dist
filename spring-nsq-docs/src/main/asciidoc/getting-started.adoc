@@ -301,6 +301,260 @@ public interface NsqOperations {
 }
 ----
 
+=== 事务性消息发送与补偿任务
+
+nsq 本身不支持发送事务性消息，现在由应用来保证消息一定会被发送出去，保证消息发送的可靠性。
+需要在业务应用库里新建一张本地消息事物表。表结构如下，表名称可自定义，默认表名: nsq_transaction_message
+
+==== table schema
+
+[source,sql,indent=0]
+----
+create table nsq_transaction_message(
+  `id` bigint(20) unsigned auto_increment comment 'primary id',
+  `created_at` datetime not null default CURRENT_TIMESTAMP comment '创建时间',
+  `updated_at` datetime not null default CURRENT_TIMESTAMP comment '修改时间',
+  `sharding_id` int(11) unsigned not null default 0 comment '分片id',
+  `business_key` varchar(64) not null default '' comment '业务key，比如tradeNo',
+  `event_type` varchar(32) not null default '' comment '事件类型',
+  `state` smallint(5) unsigned not null default 0 comment '消息投递状态, 0-CREATED, 1-PUBLISHED',
+  `env` varchar(16) not null default '' comment '当前环境',
+  `topic` varchar(256) not null default '' comment '消息topic',
+  `payload` varchar(2048) not null default '' comment '消息体',
+
+  primary key (`id`),
+  unique key uniq_tb(`event_type`, `business_key`),
+  key idx_sc (`state`, `created_at`)
+)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 comment='本地消息事务表';
+----
+
+==== TransactionNsqTemplate API
+
+应用使用 `TransactionNsqTemplate` 发送事务性消息
+
+[source,java,indent=0]
+----
+public interface TransactionNsqTemplate {
+
+  /**
+   * send transactional message, if message send failed, then we can send it later.
+   *
+   * @param topic   message topic
+   * @param context message context, use @{link MessageContextBuilder to build it}
+   */
+  void send(String topic, MessageContext context);
+}
+----
+
+==== application usage
+
+===== spring boot application add maven dependency
+
+[source,xml,indent=0,subs="verbatim,quotes,attributes"]
+----
+<dependency>
+    <groupId>com.youzan.spring.nsq</groupId>
+    <artifactId>spring-nsq-spring-boot-starter</artifactId>
+</dependency>
+----
+
+===== non spring-boot application add maven-dependency
+
+[source,xml,indent=0,subs="verbatim,quotes,attributes"]
+----
+<dependency>
+    <groupId>com.youzan.spring.nsq</groupId>
+    <artifactId>spring-nsq</artifactId>
+</dependency>
+----
+
+非spring boot应用需要显示配置
+
+[source,java,indent=0]
+----
+@Configuration
+public class TransactionNsqTemplateConfiguration {
+
+  @Value("${spring.nsq.transaction.message.table-name: }")
+  private String tableName;
+
+  @Bean
+  public CurrentEnvironment currentEnvironment() {
+    return new CurrentEnvironment();
+  }
+
+
+  @Bean
+  public JdbcTemplate jdbcTemplate(@Autowired DataSource dataSource) {
+    return new JdbcTemplate(dataSource);
+  }
+
+  @Bean
+  public TransactionMessageDao transactionMessageDao(@Autowired JdbcTemplate jdbcTemplate) {
+    DefaultTransactionMessageDao transactionalMessageDao =
+        new DefaultTransactionMessageDao(jdbcTemplate);
+    transactionalMessageDao.setTableName(tableName);
+
+    return transactionalMessageDao;
+  }
+
+  @Bean
+  public TransactionNsqTemplate transactionNsqTemplate(
+      @Autowired PlatformTransactionManager transactionManager,
+      @Autowired CurrentEnvironment currentEnvironment,
+      @Autowired TransactionMessageDao transactionMessageDao,
+      @Autowired NsqTemplate nsqTemplate) {
+    return new LocalTransactionNsqTemplate(transactionManager, currentEnvironment,
+                                           nsqTemplate, transactionMessageDao);
+  }
+}
+----
+
+===== 使用示例
+
+使用 `MessageContextBuilder` 来build `MessageContext`。需要在开启事物的方法中调用transactionNsqTemplate.send() 方法
+否则，会抛出 IllegalStateException("当前线程上无绑定事物，请确保在开启了事物中的方法中调用此方法")。
+
+[source,java,indent=0]
+----
+@Component
+@Slf4j
+public class PaymentListener {
+
+  @Resource
+  private TransactionTemplate transactionTemplate;
+
+  @Resource
+  private TransactionNsqTemplate transactionNsqTemplate;
+
+
+  private void doProcessAndSend(UniformPayEvent payEvent, String tradeNo) {
+    transactionTemplate.execute(new TransactionCallbackWithoutResult(){
+      @Override
+      protected void doInTransactionWithoutResult(TransactionStatus status) {
+        Trading trading = tradingQueryService.queryTradingForUpdate(tradeNo);
+        if (trading == null) {
+          log.error("查询收单交易明细信息不存在, tradeNo={}", tradeNo);
+          return;
+        }
+
+        if (trading.isPaySuccess()) {
+          log.info("已经处理过支付核心消息, trading={}", trading);
+          return;
+        }
+
+        long amount = payEvent.getRealAmount().getCent();
+        trading.finishPayment(amount, payEvent.getAssetDetailNo());
+
+        MessageContext context = MessageContextBuilder.builder()
+            .payload(getMessage(payEvent, trading))
+            .businessKey(IdempotentKeyUtils.getMergeString(tradeNo, payEvent.getAssetDetailNo()))
+            .eventType(EventTypeEnum.PAY.name())
+            .shardingId(trading.getShardingId())
+            .wrapMessage(true)
+            .build();
+        transactionNsqTemplate.send(payTradingTopic, context);
+
+        tradingOperationService.update(trading);
+        tradingOperationService.updateContractState(trading.getContractNo(), ContractStateEnum.INIT,
+                                                    ContractStateEnum.PROCESSING);
+      }
+    });
+
+  }
+}
+----
+
+==== MessageContext 字段说明
+
+[width="90%"]
+|===
+| 属性 | 是否必填 |默认值 | 描述
+
+| businessKey | required |  | 消息的业务key，比如订单号，支付单号等，与eventType组成唯一键
+| eventType | required |  | 事件类型,比如(pay, settle)
+| payload | required |  | 消息体对象
+| shardingId | optional | 0 | 分片id,对于非分库分表应用，无需设置，或者始终设置为0
+| wrapMessage | optional | false | 是否包装payload，将payload整体作为bizBody的value，兼容老的dts消息，新消息topic不建议使用包装
+
+|===
+
+==== 配置表名称 application.properties
+
+[source,properties,indent=0,subs="verbatim,attributes,macros"]
+----
+spring.nsq.transaction.message.table-name=pay_tc_message
+----
+
+==== 补偿job和清理job
+
+`NsqCompensationJobConfiguration` 是针对非分库分表应用的补偿job和清理job的配置类。
+
+* 添加补偿job依赖
+
+[source,xml,indent=0,subs="verbatim,quotes,attributes"]
+----
+<dependency>
+    <groupId>com.youzan.spring.nsq</groupId>
+    <artifactId>spring-nsq-compensation-job</artifactId>
+</dependency>
+----
+
+* 应用引入job配置类
+
+[source,java,indent=0]
+----
+@SpringBootApplication
+@Import(NsqCompensationJobConfiguration.class)
+public class JobApplication {
+  public static void main(String[] args) {
+    YouZanBootApplication.run(JobApplication.class, args);
+  }
+}
+----
+
+===== MessagePublishCompensationJob （事务性消息补偿任务，非分库分表应用使用）
+
+用来补偿未发送成功的消息，进行重发。
+
+compensation job配置项
+
+[width="90%"]
+|===
+| 属性 | 是否必填 |默认值 | 描述
+
+| spring.nsq.transaction.message.fetch-days | optional | 7 | 事务性消息补偿任务每次查询多少天前的数据, 默认7天前
+| spring.nsq.transaction.message.fetch-size | optional | 200 | 事务性消息补偿任务每次查询数据量limit大小, 默认200条
+| spring.nsq.transaction.message.compensation-job.cron | optional | */10 * * * * ? | 事务性消息补偿任务cron表达式, 默认每10秒调度一次
+| spring.nsq.transaction.message.compensation-job.sharding-total-count | optional | 1 | 事务性消息补偿任务总分片大小, 默认1
+| spring.nsq.transaction.message.compensation-job.core-pool-size | optional | 2 | 事务性消息补偿任务core-pool-size
+| spring.nsq.transaction.message.compensation-job.max-pool-size | optional | 5 | 事务性消息补偿任务max-pool-size
+| spring.nsq.transaction.message.compensation-job.keep-alive-seconds | optional | 60 | 事务性消息补偿任务thread keepAliveSeconds,默认60秒
+| spring.nsq.transaction.message.compensation-job.queue-capacity | optional | 100 | 事务性消息补偿任务thread queue-capacity,默认100
+
+|===
+
+===== MessageTableCleanJob （事务性消息清理任务，非分库分表应用使用）
+
+清理历史已发送成功的消息。
+
+clean job配置项
+
+[width="90%"]
+|===
+| 属性 | 是否必填 |默认值 | 描述
+
+| spring.nsq.transaction.message.remain-days | optional | 30 | 事务性消息清理任务每次清理多少天前的数据, 默认30天
+| spring.nsq.transaction.message.delete-limit-size | optional | 200 | 事务性消息清理任务每次删除多少条数据, 默认200条
+| spring.nsq.transaction.message.clean-job.cron | optional | */5 * 1-6 * * ? | 事务性消息清理任务cron表达式, 默认每天的1-6点每5秒调度一次
+| spring.nsq.transaction.message.clean-job.sharding-total-count | optional | 1 | 事务性消息清理任务总分片大小, 默认1
+| spring.nsq.transaction.message.clean-job.core-pool-size | optional | 2 | 事务性消息清理任务core-pool-size
+| spring.nsq.transaction.message.clean-job.max-pool-size | optional | 5 | 事务性消息清理任务max-pool-size
+| spring.nsq.transaction.message.clean-job.keep-alive-seconds | optional | 60 | 事务性消息清理任务thread keepAliveSeconds,默认60秒
+| spring.nsq.transaction.message.clean-job.queue-capacity | optional | 100 | 事务性消息清理任务thread queue-capacity,默认100
+
+|===
+
 == tracing
 
 === 使用
