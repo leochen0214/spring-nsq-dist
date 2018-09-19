@@ -12,7 +12,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +28,7 @@ import javax.sql.DataSource;
 @Configuration
 @ConditionalOnClass(LocalTransactionNsqTemplate.class)
 @AutoConfigureAfter({SpringNsqAutoConfiguration.class, DataSourceAutoConfiguration.class,
-                     TransactionAutoConfiguration.class})
+                     DataSourceTransactionManagerAutoConfiguration.class})
 @EnableConfigurationProperties(TransactionNsqProperties.class)
 public class LocalTransactionNsqTemplateAutoConfiguration {
 
