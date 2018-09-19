@@ -41,7 +41,7 @@ public class MessageTableCleanJob implements SimpleJob {
 
     int rows = transactionMessageDao.batchDeleteOfNonSharding(date, fetchSize);
 
-    log.info("{} 清理{}天前数据, 本次清理共删除 {} 条记录", PREFIX, rows);
+    log.info("{} 清理{}天前数据, 本次清理共删除 {} 条记录", PREFIX, remainDays, rows);
   }
 
 

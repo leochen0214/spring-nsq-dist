@@ -1,8 +1,11 @@
 package com.youzan.spring.nsq.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author: clong
@@ -41,5 +44,60 @@ public class TransactionNsqProperties {
    * 事务性消息清理任务每次删除多少条数据, 默认200条
    */
   private int deleteLimitSize = DEFAULT_DELETE_LIMIT_SIZE;
+
+  /**
+   * 事务性消息补偿任务参数属性配置
+   */
+  @NestedConfigurationProperty
+  private JobProperties compensationJob;
+
+  /**
+   * 事务性消息清理任务参数属性配置
+   */
+  @NestedConfigurationProperty
+  private JobProperties cleanJob;
+
+
+  @Getter
+  @Setter
+  private static class JobProperties {
+
+    /**
+     * cron表达式, 格式为:  Seconds Minutes Hours Day-of-Month Month Day-of-Week Year (Year是可选项)
+     */
+    private String cron;
+
+    /**
+     * job总分片数
+     */
+    private int shardingTotalCount = 1;
+
+    /**
+     * job parameters
+     */
+    private String jobParameter;
+
+    /**
+     * job工作线程池core-pool-size
+     */
+    private int corePoolSize = 1;
+
+    /**
+     * job工作线程池大小max-pool-size
+     */
+    private int maxPoolSize = 10;
+
+    /**
+     * Keep-alive time in seconds
+     */
+    private int keepAliveSeconds = 60;
+
+    /**
+     * Queue capacity for the ThreadPoolTaskExecutor. If not specified, the default will be
+     * Integer.MAX_VALUE (i.e. unbounded).
+     */
+    private int queueCapacity = 100;
+
+  }
 
 }

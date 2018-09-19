@@ -20,27 +20,27 @@
      -->
     <job:dataflow id="messagePublishCompensationJob"
                   class="com.youzan.spring.nsq.compensation.job.MessagePublishCompensationJob"
-                  cron="*/10 * * * * ?"
-                  sharding-total-count="1"
-                  job-parameter=""
+                  cron="${spring.nsq.transaction.message.compensation-job.cron: */10 * * * * ?}"
+                  sharding-total-count="${spring.nsq.transaction.message.compensation-job.sharding-total-count: 1}"
+                  job-parameter="${spring.nsq.transaction.message.compensation-job.job-parameter: }"
                   disabled="true"
                   overwrite="true"
-                  core-pool-size="2"
-                  max-pool-size="5"
-                  keep-alive-seconds="60"
-                  queue-capacity="100"/>
+                  core-pool-size="${spring.nsq.transaction.message.compensation-job.core-pool-size: 2}"
+                  max-pool-size="${spring.nsq.transaction.message.compensation-job.max-pool-size: 5}"
+                  keep-alive-seconds="${spring.nsq.transaction.message.compensation-job.keep-alive-seconds: 60}"
+                  queue-capacity="${spring.nsq.transaction.message.compensation-job.queue-capacity: 100}"/>
 
     <job:simple id="messageTableCleanJob"
-                  class="com.youzan.spring.nsq.compensation.job.MessageTableCleanJob"
-                  cron="*/5 * 1-6 * * ?"
-                  sharding-total-count="1"
-                  job-parameter=""
-                  disabled="true"
-                  overwrite="true"
-                  core-pool-size="2"
-                  max-pool-size="5"
-                  keep-alive-seconds="60"
-                  queue-capacity="100"/>
+                class="com.youzan.spring.nsq.compensation.job.MessageTableCleanJob"
+                cron="${spring.nsq.transaction.message.clean-job.cron: */5 * 1-6 * * ?}"
+                sharding-total-count="${spring.nsq.transaction.message.clean-job.sharding-total-count: 1}"
+                job-parameter="${spring.nsq.transaction.message.clean-job.job-parameter: }"
+                disabled="true"
+                overwrite="true"
+                core-pool-size="${spring.nsq.transaction.message.clean-job.core-pool-size: 2}"
+                max-pool-size="${spring.nsq.transaction.message.clean-job.max-pool-size: 5}"
+                keep-alive-seconds="${spring.nsq.transaction.message.clean-job.keep-alive-seconds: 60}"
+                queue-capacity="${spring.nsq.transaction.message.clean-job.queue-capacity: 100}"/>
 
 
 </beans>
