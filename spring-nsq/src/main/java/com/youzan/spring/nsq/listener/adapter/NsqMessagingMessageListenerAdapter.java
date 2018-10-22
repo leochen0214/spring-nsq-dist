@@ -48,10 +48,10 @@ public class NsqMessagingMessageListenerAdapter extends MessagingMessageListener
       }
 
       try {
-        this.errorHandler.handleError(data, e, consumer);
         if (log.isDebugEnabled()) {
-          log.debug("NsqListenerErrorHandler handle error");
+          log.debug("NsqListenerErrorHandler handle error, message data={}", data.getReadableContent());
         }
+        this.errorHandler.handleError(data, e, consumer);
       } catch (Exception ex) {
         throw new ListenerExecutionFailedException(createMessagingErrorMessage(
             "Listener error handler threw an exception for the incoming message",

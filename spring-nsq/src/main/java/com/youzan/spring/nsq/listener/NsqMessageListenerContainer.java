@@ -6,6 +6,7 @@ import com.youzan.nsq.client.entity.Topic;
 import com.youzan.nsq.client.exception.NSQException;
 import com.youzan.spring.nsq.core.ConsumerFactory;
 import com.youzan.spring.nsq.core.RequeuePolicy;
+import com.youzan.spring.nsq.exception.NsqNotRequeueException;
 import com.youzan.spring.nsq.properties.ConsumerConfigProperties;
 
 import org.springframework.util.Assert;
@@ -47,7 +48,7 @@ public class NsqMessageListenerContainer extends AbstractMessageListenerContaine
     consumer = consumerFactory.createConsumer(properties);
     consumer.setAutoFinish(properties.isAutoFinish());
     consumer.setMessageHandler(message -> doInvokeMessageListener(message, listener, listenerType,
-                                           requeuePolicy, unpackMessage));
+                                                                  requeuePolicy, unpackMessage));
     consumer.subscribe(toArray(properties));
     startConsumer();
   }
@@ -91,6 +92,9 @@ public class NsqMessageListenerContainer extends AbstractMessageListenerContaine
           listener.onMessage(message, unpackMessage);
           break;
       }
+    } catch (NsqNotRequeueException e) {
+      log.info("occur NsqNotRequeueException, nsq message will not requeue, message data={}",
+               message.getReadableContent());
     } catch (Exception e) {
       if (errorHandler != null) {
         errorHandler.handle(e, message, this.consumer);
