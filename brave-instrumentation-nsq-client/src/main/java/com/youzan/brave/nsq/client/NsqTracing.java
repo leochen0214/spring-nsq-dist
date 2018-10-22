@@ -81,8 +81,10 @@ public class NsqTracing {
   public Span nextSpan(NSQMessage message) {
     TraceContextOrSamplingFlags extracted = extractAndClearHeaders(message);
     Span span = tracing.tracer().nextSpan(extracted);
-    if (extracted.context() == null && !span.isNoop()) {
-      addTags(message, span);
+    if (!span.isNoop()) {
+      span.tag(NsqTags.NSQ_TOPIC_TAG, message.getTopicInfo().getTopicName());
+      span.tag(NsqTags.READABLE_ATTEMPTS, String.valueOf(message.getReadableAttempts()));
+      span.tag(NsqTags.NEXT_CONSUMING_IN_SECOND, String.valueOf(message.getNextConsumingInSecond()));
     }
     return span;
   }
@@ -94,13 +96,6 @@ public class NsqTracing {
     }
 
     return extractor.extract(headers);
-  }
-
-  /**
-   * When an upstream context was not present, lookup keys are unlikely added
-   */
-  static void addTags(NSQMessage record, SpanCustomizer result) {
-    result.tag(NsqTags.NSQ_TOPIC_TAG, record.getTopicInfo().getTopicName());
   }
 
 

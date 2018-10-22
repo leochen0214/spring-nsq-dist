@@ -4,6 +4,7 @@ import com.youzan.brave.nsq.client.NsqTracing;
 import com.youzan.sleuth.instrument.messaging.SleuthSpringNsqAspect;
 import com.youzan.spring.nsq.core.ProducerFactory;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -34,8 +35,11 @@ public class NsqMessageTracingAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public NsqTracing nsqTracing(Tracing tracing) {
-      return NsqTracing.newBuilder(tracing).build();
+    public NsqTracing nsqTracing(Tracing tracing,
+                                 @Value("${spring.nsq.lookup-address: -}") String lookupAddress) {
+      return NsqTracing.newBuilder(tracing)
+          .remoteServiceName(lookupAddress)
+          .build();
     }
 
     @Bean

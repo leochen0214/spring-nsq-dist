@@ -16,6 +16,7 @@ import brave.Tracer;
  * @author: clong
  * @date: 2018-09-03
  */
+
 public class MessageListenerMethodInterceptor implements MethodInterceptor {
 
   private static final String METHOD_NAME = "onMessage";
@@ -49,7 +50,9 @@ public class MessageListenerMethodInterceptor implements MethodInterceptor {
     }
 
     NSQMessage nsqMessage = (NSQMessage) message.get();
-    Span span = this.nsqTracing.nextSpan(nsqMessage).name(METHOD_NAME).start();
+    Span span = this.nsqTracing.nextSpan(nsqMessage)
+        .kind(Span.Kind.CONSUMER)
+        .name(METHOD_NAME).start();
     try (Tracer.SpanInScope ws = this.tracer.withSpanInScope(span)) {
       return invocation.proceed();
     } catch (RuntimeException | Error e) {

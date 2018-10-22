@@ -90,26 +90,25 @@ public class TracingProducer implements Producer {
     //trace here
     Span span = tracing.tracer().nextSpan();
     tracing.propagation().keys().forEach(headers::remove);
-
-    if (!span.isNoop()) {
-      if (remoteServiceName != null) {
-        span.remoteServiceName(remoteServiceName);
-      }
-      span.tag(NsqTags.NSQ_TOPIC_TAG, message.getTopic().getTopicText())
-          .name("send")
-          .kind(Span.Kind.PRODUCER)
-          .start();
-    }
     injector.inject(span.context(), headers);
+
     try (Tracer.SpanInScope ws = tracing.tracer().withSpanInScope(span)) {
       delegate.publish(message);
+      if (!span.isNoop()) {
+        span.tag(NsqTags.NSQ_TOPIC_TAG, message.getTopic().getTopicText())
+            .name("send")
+            .kind(Span.Kind.PRODUCER)
+            .remoteServiceName(remoteServiceName);
+      }
+      span.start();
     } catch (RuntimeException | Error e) {
       span.error(e); // finish as an exception means the callback won't finish the span
       throw e;
-    }finally {
+    } finally {
       span.finish();
     }
   }
+
 
   @Override
   public void publish(byte[] message, String topic) throws NSQException {
