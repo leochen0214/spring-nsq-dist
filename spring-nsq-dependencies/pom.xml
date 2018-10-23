@@ -115,12 +115,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.youzan.payment.middleware</groupId>
                 <artifactId>job-client</artifactId>
                 <version>${job-client.version}</version>
