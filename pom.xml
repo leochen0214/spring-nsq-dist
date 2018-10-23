@@ -5,7 +5,7 @@
     <groupId>com.youzan.spring.nsq</groupId>
     <artifactId>spring-nsq-dist</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
 
     <modules>
         <module>spring-nsq-dependencies</module>
@@ -29,7 +29,7 @@
         <connection>scm:git:git@gitlab.qima-inc.com:chenlong/spring-nsq-dist.git</connection>
         <url>http://gitlab.qima-inc.com/chenlong/spring-nsq-dist</url>
         <developerConnection>scm:git:git@gitlab.qima-inc.com:chenlong/spring-nsq-dist.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>v1.0.2</tag>
     </scm>
 
     <build>
