@@ -51,6 +51,7 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-sleuth-core</artifactId>
+            <version>${spring-cloud-sleuth.version}</version>
         </dependency>
 
         <dependency>
