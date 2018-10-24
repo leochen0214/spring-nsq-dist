@@ -559,6 +559,9 @@ clean job配置项
 
 == tracing
 
+WARNING: 开启tracing时，发送nsq消息的topic需要升级成支持EXT Header, 目前qa环境大多数已经升级，预发和线上需要确认下，
+以免出现消息发送失败异常。
+
 === 使用
 
 ==== 添加如下依赖
