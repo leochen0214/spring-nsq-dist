@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.youzan.spring.nsq</groupId>
         <artifactId>spring-nsq-dependencies</artifactId>
-        <version>1.0.5</version>
+        <version>1.0.6-SNAPSHOT</version>
         <relativePath>../spring-nsq-dependencies</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
