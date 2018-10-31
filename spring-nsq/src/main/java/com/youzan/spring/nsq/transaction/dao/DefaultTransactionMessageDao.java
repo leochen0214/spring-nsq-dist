@@ -1,5 +1,6 @@
 package com.youzan.spring.nsq.transaction.dao;
 
+import com.youzan.platform.service_chain.context.ServiceChainContext;
 import com.youzan.spring.nsq.transaction.domain.MessageStateEnum;
 import com.youzan.spring.nsq.transaction.domain.TransactionMessage;
 
@@ -12,6 +13,7 @@ import org.springframework.util.StringUtils;
 import java.sql.PreparedStatement;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 public class DefaultTransactionMessageDao implements TransactionMessageDao {
 
   private static final String DEFAULT_TABLE_NAME = "nsq_transaction_message";
+
+  private static String ZAN_TEST_RDS_TAG = "/*!ctx:shadow*/";
 
   private static final int MAX_DELETE_SIZE = 200;
 
@@ -67,7 +71,8 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
 
   @Override
   public int insert(TransactionMessage message) {
-    String sql = getInsertSql();
+    String sql = addHeaderIfIsPressureTest(getInsertSql());
+
     KeyHolder keyHolder = new GeneratedKeyHolder();
 
     int affectRows = jdbcTemplate.update(conn -> {
@@ -91,9 +96,21 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
     return affectRows;
   }
 
+  private String addHeaderIfIsPressureTest(String sql) {
+    if (isPressureTest()) {
+      return ZAN_TEST_RDS_TAG + sql;
+    }
+    return sql;
+  }
+
+  private boolean isPressureTest() {
+    Optional<Boolean> invocationZanTest = ServiceChainContext.isInvocationZanTest();
+    return invocationZanTest.isPresent() && invocationZanTest.get();
+  }
+
   @Override
   public int updateState(Long id, int shardingId, int toState) {
-    String sql = getUpdateStateSql();
+    String sql = addHeaderIfIsPressureTest(getUpdateStateSql());
 
     return jdbcTemplate.update(sql, ps -> {
       ps.setInt(1, toState);
@@ -110,7 +127,7 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
   @Override
   public TransactionMessage querySingleMessage(String businessKey, String eventType,
                                                int shardingId) {
-    String sql = getQuerySingleMessageSql();
+    String sql = addHeaderIfIsPressureTest(getQuerySingleMessageSql());
 
     List<TransactionMessage> list =
         jdbcTemplate.query(sql, getRowMapper(), businessKey, eventType, shardingId);
@@ -131,15 +148,16 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
   @Override
   public List<TransactionMessage> queryPublishFailedMessagesOfNonSharding(Date from, int fetchSize,
                                                                           String env) {
-    String sql = getQueryNonShardingMessagesSql(">=");
+    String sql = addHeaderIfIsPressureTest(getQueryNonShardingMessagesSql(">="));
     int state = MessageStateEnum.CREATED.getCode();
     return jdbcTemplate.query(sql, getRowMapper(), state, from, env, fetchSize);
   }
 
 
   @Override
-  public List<TransactionMessage> queryCanDeleteMessagesOfNonSharding(Date untilTo, int fetchSize, String env) {
-    String sql = getQueryNonShardingMessagesSql("<=");
+  public List<TransactionMessage> queryCanDeleteMessagesOfNonSharding(Date untilTo, int fetchSize,
+                                                                      String env) {
+    String sql = addHeaderIfIsPressureTest(getQueryNonShardingMessagesSql("<="));
     int state = MessageStateEnum.PUBLISHED.getCode();
     return jdbcTemplate.query(sql, getRowMapper(), state, untilTo, env, fetchSize);
   }
@@ -147,7 +165,7 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
   @Override
   public int batchDeleteOfNonSharding(Date untilTo, int fetchSize) {
     int limit = Math.min(fetchSize, MAX_DELETE_SIZE);
-    String sql = String.format(BATCH_DELETE_NON_SHARDING_SQL_FORMAT, tableName);
+    String sql = addHeaderIfIsPressureTest(String.format(BATCH_DELETE_NON_SHARDING_SQL_FORMAT, tableName));
     return jdbcTemplate.update(sql, untilTo, limit);
   }
 
