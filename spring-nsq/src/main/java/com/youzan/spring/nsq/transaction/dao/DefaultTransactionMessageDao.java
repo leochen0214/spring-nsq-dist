@@ -26,7 +26,7 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
 
   private static final String DEFAULT_TABLE_NAME = "nsq_transaction_message";
 
-  private static String ZAN_TEST_RDS_TAG = "/*!ctx:shadow*/";
+  private static final String ZAN_TEST_RDS_TAG = "/*!ctx:shadow*/";
 
   private static final int MAX_DELETE_SIZE = 200;
 
