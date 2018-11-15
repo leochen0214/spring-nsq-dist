@@ -81,7 +81,7 @@ public class JsonMessageConverter extends MessagingMessageConverter {
   @Data
   public static class Headers {
 
-    private String actionId;
+    private String actionId = "";
     private String txId;
   }
 
