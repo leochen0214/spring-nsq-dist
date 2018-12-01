@@ -6,6 +6,8 @@ import com.youzan.spring.nsq.transaction.LocalTransactionNsqTemplate;
 import com.youzan.spring.nsq.transaction.TransactionNsqTemplate;
 import com.youzan.spring.nsq.transaction.dao.DefaultTransactionMessageDao;
 import com.youzan.spring.nsq.transaction.dao.TransactionMessageDao;
+import com.youzan.spring.nsq.transaction.service.DefaultTransactionMessageService;
+import com.youzan.spring.nsq.transaction.service.TransactionMessageService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -57,6 +59,14 @@ public class LocalTransactionNsqTemplateAutoConfiguration {
     transactionalMessageDao.setTableName(properties.getTableName());
 
     return transactionalMessageDao;
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  public TransactionMessageService transactionMessageService(
+      @Autowired TransactionMessageDao transactionMessageDao,
+      @Autowired NsqTemplate nsqTemplate) {
+    return new DefaultTransactionMessageService(transactionMessageDao, nsqTemplate);
   }
 
   @Bean
