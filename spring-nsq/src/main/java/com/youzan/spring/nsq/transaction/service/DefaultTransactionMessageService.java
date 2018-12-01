@@ -32,25 +32,20 @@ public class DefaultTransactionMessageService implements TransactionMessageServi
   }
 
   @Override
-  public void publishAgain(List<TransactionMessage> messages) {
+  public long publishAgain(List<TransactionMessage> messages) {
     if (messages == null || messages.isEmpty()) {
-      return;
+      return 0;
     }
 
     log.info("{}此次需要重发的消息共有{}条", PREFIX, messages.size());
-    int successCount = 0;
-    for (TransactionMessage message : messages) {
-      if (isEmptyTopic(message)) {
-        log.error("message topic is empty, message={}", message);
-      } else {
-        boolean success = doSend(message);
-        if (success) {
-          successCount++;
-        }
-      }
-    }
+
+    long successCount = messages.stream().filter(this::isNotEmptyTopic)
+        .map(this::doSend).filter(Boolean::booleanValue).count();
+
     log.info("{}此次需要重发的{}条消息处理完毕, 消息重发成功并且更新消息状态成功的共{}条",
              PREFIX, messages.size(), successCount);
+
+    return successCount;
   }
 
   @Override
@@ -58,26 +53,22 @@ public class DefaultTransactionMessageService implements TransactionMessageServi
     return transactionMessageDao;
   }
 
-  private boolean isEmptyTopic(TransactionMessage message) {
-    return !StringUtils.hasText(message.getTopic());
+  private boolean isNotEmptyTopic(TransactionMessage message) {
+    return StringUtils.hasText(message.getTopic());
   }
 
   private boolean doSend(TransactionMessage message) {
-    boolean sendSuccess = doSendNsqMessage(message);
-    boolean updateSuccess = false;
-    if (sendSuccess) {
+    if (sendNsqMessageSuccess(message)) {
       log.info("{}补偿重发消息成功, message={}", PREFIX, message);
-      updateSuccess = doUpdateMessageState(message);
+      if (updateMessageStateSuccess(message)) {
+        log.info("{}此次更新消息表状态为已发送成功, message={}", PREFIX, message);
+        return true;
+      }
     }
-
-    if (updateSuccess) {
-      log.info("{}此次更新消息表状态为已发送成功, message={}", PREFIX, message);
-    }
-
-    return sendSuccess && updateSuccess;
+    return false;
   }
 
-  private boolean doSendNsqMessage(TransactionMessage message) {
+  private boolean sendNsqMessageSuccess(TransactionMessage message) {
     try {
       Message nsqMessage = Message.create(new Topic(message.getTopic()), message.getPayload());
       nsqTemplate.send(nsqMessage);
@@ -88,7 +79,7 @@ public class DefaultTransactionMessageService implements TransactionMessageServi
     return false;
   }
 
-  private boolean doUpdateMessageState(TransactionMessage message) {
+  private boolean updateMessageStateSuccess(TransactionMessage message) {
     try {
       transactionMessageDao.updateState(message.getId(), message.getShardingId(),
                                         MessageStateEnum.PUBLISHED.getCode());

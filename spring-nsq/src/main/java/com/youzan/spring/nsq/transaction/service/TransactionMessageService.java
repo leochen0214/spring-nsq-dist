@@ -11,12 +11,14 @@ import java.util.List;
  */
 public interface TransactionMessageService {
 
+
   /**
    * send publishing failed message again.
    *
    * @param messages publish failed messages
+   * @return the messages count of publish success.
    */
-  void publishAgain(List<TransactionMessage> messages);
+  long publishAgain(List<TransactionMessage> messages);
 
   /**
    * @return the TransactionMessageDao
