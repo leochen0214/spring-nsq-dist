@@ -30,26 +30,34 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
 
   private static final int MAX_DELETE_SIZE = 200;
 
-  private static final String ALL_COLUMNS =
-      "id, created_at, updated_at, sharding_id, business_key, event_type, state, env, payload, topic";
+  private static final String BASE_COLUMNS =
+      "sharding_id, business_key, event_type, state, env, payload, topic";
+
+  private static final String ALL_COLUMNS = "id, created_at, updated_at, " + BASE_COLUMNS;
 
   private static final String INSERT_SQL_FORMAT =
-      "insert into %s (" + ALL_COLUMNS + ") values (null, now(), now(), ?, ?, ?, ?, ?, ?, ?)";
+      "insert into %s (" + BASE_COLUMNS + ") values (?, ?, ?, ?, ?, ?, ?)";
 
   private static final String UPDATE_STATE_SQL_FORMAT =
       "update %s set updated_at = now(), state=? where id=? and sharding_id=?";
 
-  private static final String SELECT_ALL_COLUMNS = "select " + ALL_COLUMNS;
+  private static final String SELECT_ALL_COLUMNS = "select " + ALL_COLUMNS + " from %s";
 
   private static final String QUERY_SINGLE_MESSAGE_SQL_FORMAT =
-      SELECT_ALL_COLUMNS + " from %s where business_key=? and event_type=? and sharding_id=?";
+      SELECT_ALL_COLUMNS + " where business_key=? and event_type=? and sharding_id=?";
 
-  private static final String QUERY_NON_SHARDING_MESSAGES_SQL_FORMAT =
-      SELECT_ALL_COLUMNS
-      + " from %s where state=? and sharding_id=0 and created_at %s ? and env=? order by created_at limit ?";
+  private static final String BASE_QUERY_MESSAGES =
+      SELECT_ALL_COLUMNS + " where state=? and sharding_id=? and created_at %s ?";
+  private static final String ORDER_BY_CREATED_AT_LIMIT = " order by created_at limit ?";
 
-  private static final String BATCH_DELETE_NON_SHARDING_SQL_FORMAT =
-      "delete from %s where state=1 and sharding_id=0 and created_at <= ? limit ?";
+  private static final String QUERY_MESSAGES_SQL_FORMAT =
+      BASE_QUERY_MESSAGES + ORDER_BY_CREATED_AT_LIMIT;
+
+  private static final String QUERY_MESSAGES_WITH_ENV_SQL_FORMAT =
+      BASE_QUERY_MESSAGES + " and env=?" + ORDER_BY_CREATED_AT_LIMIT;
+
+  private static final String BATCH_DELETE_SQL_FORMAT =
+      "delete from %s where state=1 and sharding_id=? and created_at <= ? limit ?";
 
   private final JdbcTemplate jdbcTemplate;
 
@@ -88,24 +96,11 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
       return ps;
     }, keyHolder);
 
-    Number key = keyHolder.getKey();
-    if (key != null) {
-      message.setId(key.longValue());
+    Object id = keyHolder.getKeys().get("id");
+    if (id != null) {
+      message.setId((Long) id);
     }
-
     return affectRows;
-  }
-
-  private String addHeaderIfIsPressureTest(String sql) {
-    if (isPressureTest()) {
-      return ZAN_TEST_RDS_TAG + sql;
-    }
-    return sql;
-  }
-
-  private boolean isPressureTest() {
-    Optional<Boolean> invocationZanTest = ServiceChainContext.isInvocationZanTest();
-    return invocationZanTest.isPresent() && invocationZanTest.get();
   }
 
   @Override
@@ -117,11 +112,6 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
       ps.setLong(2, id);
       ps.setInt(3, shardingId);
     });
-  }
-
-  @Override
-  public TransactionMessage querySingleMessageOfNonSharding(String businessKey, String eventType) {
-    return querySingleMessage(businessKey, eventType, 0);
   }
 
   @Override
@@ -146,32 +136,45 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
   }
 
   @Override
-  public List<TransactionMessage> queryPublishFailedMessagesOfNonSharding(Date from, int fetchSize,
-                                                                          String env) {
-    String sql = addHeaderIfIsPressureTest(getQueryNonShardingMessagesSql(">="));
+  public List<TransactionMessage> queryPublishFailedMessages(Date from, int fetchSize,
+                                                             String env, int shardingId) {
     int state = MessageStateEnum.CREATED.getCode();
-    return jdbcTemplate.query(sql, getRowMapper(), state, from, env, fetchSize);
+    String sqlFormat;
+    Object[] args;
+    if (StringUtils.hasText(env)) {
+      sqlFormat = QUERY_MESSAGES_WITH_ENV_SQL_FORMAT;
+      args = new Object[]{state, shardingId, from, env, fetchSize};
+    } else {
+      sqlFormat = QUERY_MESSAGES_SQL_FORMAT;
+      args = new Object[]{state, shardingId, from, fetchSize};
+    }
+
+    String sql = addHeaderIfIsPressureTest(getQueryMessagesSql(sqlFormat, ">="));
+    return jdbcTemplate.query(sql, getRowMapper(), args);
   }
 
-
   @Override
-  public List<TransactionMessage> queryCanDeleteMessagesOfNonSharding(Date untilTo, int fetchSize,
-                                                                      String env) {
-    String sql = addHeaderIfIsPressureTest(getQueryNonShardingMessagesSql("<="));
-    int state = MessageStateEnum.PUBLISHED.getCode();
-    return jdbcTemplate.query(sql, getRowMapper(), state, untilTo, env, fetchSize);
-  }
-
-  @Override
-  public int batchDeleteOfNonSharding(Date untilTo, int fetchSize) {
+  public int batchDelete(Date untilTo, int fetchSize, int shardingId) {
     int limit = Math.min(fetchSize, MAX_DELETE_SIZE);
-    String sql = addHeaderIfIsPressureTest(String.format(BATCH_DELETE_NON_SHARDING_SQL_FORMAT, tableName));
-    return jdbcTemplate.update(sql, untilTo, limit);
+    String sql = addHeaderIfIsPressureTest(String.format(BATCH_DELETE_SQL_FORMAT, tableName));
+    return jdbcTemplate.update(sql, shardingId, untilTo, limit);
   }
 
 
   private String getInsertSql() {
     return format(INSERT_SQL_FORMAT, tableName);
+  }
+
+  private String addHeaderIfIsPressureTest(String sql) {
+    if (isPressureTest()) {
+      return ZAN_TEST_RDS_TAG + sql;
+    }
+    return sql;
+  }
+
+  private boolean isPressureTest() {
+    Optional<Boolean> invocationZanTest = ServiceChainContext.isInvocationZanTest();
+    return invocationZanTest.isPresent() && invocationZanTest.get();
   }
 
   private String getUpdateStateSql() {
@@ -182,8 +185,8 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
     return format(QUERY_SINGLE_MESSAGE_SQL_FORMAT, tableName);
   }
 
-  private String getQueryNonShardingMessagesSql(String symbol) {
-    return String.format(QUERY_NON_SHARDING_MESSAGES_SQL_FORMAT, tableName, symbol);
+  private String getQueryMessagesSql(String sqlFormat, String symbol) {
+    return String.format(sqlFormat, tableName, symbol);
   }
 
   private String format(String format, String parameter) {

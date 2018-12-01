@@ -30,7 +30,6 @@ public interface TransactionMessageDao {
    */
   int updateState(Long id, int shardingId, int toState);
 
-
   /**
    * query single message from non-sharding database
    *
@@ -38,7 +37,9 @@ public interface TransactionMessageDao {
    * @param eventType   the event type
    * @return the single message record
    */
-  TransactionMessage querySingleMessageOfNonSharding(String businessKey, String eventType);
+  default TransactionMessage querySingleMessageOfNonSharding(String businessKey, String eventType) {
+    return querySingleMessage(businessKey, eventType, 0);
+  }
 
   /**
    * query single message record
@@ -55,23 +56,50 @@ public interface TransactionMessageDao {
    *
    * @param from      the create time which is great or equal than (>=) from
    * @param fetchSize the limit size
+   * @return send failed messages.
+   */
+  default List<TransactionMessage> queryPublishFailedMessagesOfNonSharding(Date from,
+                                                                           int fetchSize) {
+    return queryPublishFailedMessagesOfNonSharding(from, fetchSize, null);
+  }
+
+  /**
+   * query send failed messages from non-sharding database
+   *
+   * @param from      the create time which is great or equal than (>=) from
+   * @param fetchSize the limit size
    * @param env       the current environment
    * @return send failed messages.
    */
-  List<TransactionMessage> queryPublishFailedMessagesOfNonSharding(Date from, int fetchSize,
-                                                                   String env);
+  default List<TransactionMessage> queryPublishFailedMessagesOfNonSharding(Date from, int fetchSize,
+                                                                           String env) {
+    return queryPublishFailedMessages(from, fetchSize, env, 0);
+  }
 
   /**
-   * query the messages which can be deleted safely from non-sharding database
+   * query send failed messages from database
    *
-   * @param untilTo   the create time which is less or equal than (<=) untilTo
-   * @param fetchSize the limit size
-   * @param env       the current environment
-   * @return send success messages.
+   * @param from       the create time which is great or equal than (>=) from
+   * @param fetchSize  the limit size
+   * @param shardingId the sharding id
+   * @return send failed messages.
    */
-  List<TransactionMessage> queryCanDeleteMessagesOfNonSharding(Date untilTo, int fetchSize,
-                                                               String env);
+  default List<TransactionMessage> queryPublishFailedMessages(Date from, int fetchSize,
+                                                              int shardingId) {
+    return queryPublishFailedMessages(from, fetchSize, null, shardingId);
+  }
 
+  /**
+   * query send failed messages from database
+   *
+   * @param from       the create time which is great or equal than (>=) from
+   * @param fetchSize  the limit size
+   * @param env        the current environment
+   * @param shardingId the sharding id
+   * @return send failed messages.
+   */
+  List<TransactionMessage> queryPublishFailedMessages(Date from, int fetchSize,
+                                                      String env, int shardingId);
 
   /**
    * batch delete messages (which are publishing success)
@@ -80,5 +108,17 @@ public interface TransactionMessageDao {
    * @param fetchSize the limit size
    * @return the deleted rows count
    */
-  int batchDeleteOfNonSharding(Date untilTo, int fetchSize);
+  default int batchDeleteOfNonSharding(Date untilTo, int fetchSize) {
+    return batchDelete(untilTo, fetchSize, 0);
+  }
+
+  /**
+   * batch delete messages (which are publishing success)
+   *
+   * @param untilTo    the create time which is less or equal than (<=) untilTo
+   * @param fetchSize  the limit size
+   * @param shardingId the sharding id
+   * @return the deleted rows count
+   */
+  int batchDelete(Date untilTo, int fetchSize, int shardingId);
 }
