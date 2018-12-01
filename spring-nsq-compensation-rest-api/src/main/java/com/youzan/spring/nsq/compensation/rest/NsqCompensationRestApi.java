@@ -43,7 +43,7 @@ public class NsqCompensationRestApi {
   }
 
 
-  @GetMapping("publishAgain")
+  @GetMapping("/publishAgain")
   public String publishAgain(
       @RequestParam(name = "daysAgo", required = false, defaultValue = "7") int daysAgo,
       @RequestParam(name = "size", required = false, defaultValue = "200") int size,
