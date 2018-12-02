@@ -30,7 +30,8 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
 
   private static final int MAX_DELETE_SIZE = 200;
 
-  private static final String ALL_COLUMNS = "id, created_at, updated_at, sharding_id, business_key, event_type, state, env, payload, topic";
+  private static final String ALL_COLUMNS =
+      "id,created_at,updated_at,sharding_id,business_key,event_type,state,env,payload,topic";
 
   private static final String INSERT_SQL_FORMAT =
       "insert into %s (" + ALL_COLUMNS + ") values (null, now(), now(), ?, ?, ?, ?, ?, ?, ?)";
