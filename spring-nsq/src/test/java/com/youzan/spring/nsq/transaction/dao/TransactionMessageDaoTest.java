@@ -52,6 +52,7 @@ public class TransactionMessageDaoTest {
 
     jdbcTemplate = new JdbcTemplate(db);
     transactionMessageDao = new DefaultTransactionMessageDao(jdbcTemplate);
+    transactionMessageDao.setSecondsAgo(1);
   }
 
 

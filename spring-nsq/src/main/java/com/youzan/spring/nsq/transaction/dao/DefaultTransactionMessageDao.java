@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.util.StringUtils;
 
 import java.sql.PreparedStatement;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,8 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
 
   private static final int MAX_DELETE_SIZE = 200;
 
+  private static final int DEFAULT_SECONDS_AGO = 30;
+
   private static final String ALL_COLUMNS =
       "id,created_at,updated_at,sharding_id,business_key,event_type,state,env,payload,topic";
 
@@ -39,13 +42,13 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
   private static final String UPDATE_STATE_SQL_FORMAT =
       "update %s set updated_at = now(), state=? where id=? and sharding_id=?";
 
-  private static final String SELECT_ALL_COLUMNS = "select " + ALL_COLUMNS + " from %s";
+  private static final String SELECT_ALL = "select " + ALL_COLUMNS + " from %s ";
 
   private static final String QUERY_SINGLE_MESSAGE_SQL_FORMAT =
-      SELECT_ALL_COLUMNS + " where business_key=? and event_type=? and sharding_id=?";
+      SELECT_ALL + "where business_key=? and event_type=? and sharding_id=?";
 
   private static final String BASE_QUERY_MESSAGES =
-      SELECT_ALL_COLUMNS + " where state=? and sharding_id=? and created_at %s ?";
+      SELECT_ALL + "where state=? and sharding_id=? and created_at>=? and created_at <=?";
   private static final String ORDER_BY_CREATED_AT_LIMIT = " order by created_at limit ?";
 
   private static final String QUERY_MESSAGES_SQL_FORMAT =
@@ -64,6 +67,11 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
    */
   private String tableName = DEFAULT_TABLE_NAME;
 
+  /**
+   * seconds ago
+   */
+  private int secondsAgo = DEFAULT_SECONDS_AGO;
+
   public DefaultTransactionMessageDao(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
   }
@@ -74,6 +82,11 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
       this.tableName = tableName;
     }
   }
+
+  public void setSecondsAgo(int secondsAgo) {
+    this.secondsAgo = secondsAgo;
+  }
+
 
   @Override
   public int insert(TransactionMessage message) {
@@ -137,17 +150,18 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
   public List<TransactionMessage> queryPublishFailedMessages(Date from, int fetchSize,
                                                              String env, int shardingId) {
     int state = MessageStateEnum.CREATED.getCode();
+    Date to = Date.from(ZonedDateTime.now().minusSeconds(secondsAgo).toInstant());
     String sqlFormat;
     Object[] args;
     if (StringUtils.hasText(env)) {
       sqlFormat = QUERY_MESSAGES_WITH_ENV_SQL_FORMAT;
-      args = new Object[]{state, shardingId, from, env, fetchSize};
+      args = new Object[]{state, shardingId, from, to, env, fetchSize};
     } else {
       sqlFormat = QUERY_MESSAGES_SQL_FORMAT;
-      args = new Object[]{state, shardingId, from, fetchSize};
+      args = new Object[]{state, shardingId, from, to, fetchSize};
     }
 
-    String sql = addHeaderIfIsPressureTest(getQueryMessagesSql(sqlFormat, ">="));
+    String sql = addHeaderIfIsPressureTest(getQueryMessagesSql(sqlFormat));
     return jdbcTemplate.query(sql, getRowMapper(), args);
   }
 
@@ -183,8 +197,8 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
     return format(QUERY_SINGLE_MESSAGE_SQL_FORMAT, tableName);
   }
 
-  private String getQueryMessagesSql(String sqlFormat, String symbol) {
-    return String.format(sqlFormat, tableName, symbol);
+  private String getQueryMessagesSql(String sqlFormat) {
+    return String.format(sqlFormat, tableName, ">=");
   }
 
   private String format(String format, String parameter) {

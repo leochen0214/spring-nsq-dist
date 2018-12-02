@@ -10,7 +10,7 @@ insert into nsq_transaction_message (
   payload,
   topic) values (
     1,
-    now(),
+    CURRENT_DATE,
     now(),
     0,
     '123',
