@@ -55,7 +55,7 @@ public class LocalTransactionNsqTemplate implements TransactionNsqTemplate {
     }
 
     String payload = getPayload(context);
-    TransactionMessage messageDO = TransactionMessageBuilder.builder()
+    TransactionMessage message = TransactionMessageBuilder.builder()
         .businessKey(context.getBusinessKey())
         .eventType(context.getEventType())
         .shardingId(context.getShardingId())
@@ -67,10 +67,7 @@ public class LocalTransactionNsqTemplate implements TransactionNsqTemplate {
 
     boolean success = false;
     try {
-      success = template.execute(status -> {
-        int rows = transactionMessageDao.insert(messageDO);
-        return rows == 1;
-      });
+      success = insert(message);
     } catch (DuplicateKeyException e) {
       log.warn("重复消息，不入库", e);
     }
@@ -80,11 +77,18 @@ public class LocalTransactionNsqTemplate implements TransactionNsqTemplate {
           .registerSynchronization(new TransactionSynchronizationAdapter() {
             @Override
             public void afterCommit() {
-              doSend(context.getEventType(), topic, payload, messageDO);
+              doSend(context.getEventType(), topic, payload, message);
             }
           });
     }
 
+  }
+
+  private Boolean insert(TransactionMessage message) {
+    return template.execute(status -> {
+      int rows = transactionMessageDao.insert(message);
+      return rows == 1;
+    });
   }
 
   private TransactionTemplate createTransactionTemplate(PlatformTransactionManager txManager) {
@@ -94,21 +98,20 @@ public class LocalTransactionNsqTemplate implements TransactionNsqTemplate {
     return template;
   }
 
-  private void doSend(String eventType, String topic, String msg, TransactionMessage messageDO) {
-    log.info("开始发送{}消息, message={}", eventType, msg);
+  private void doSend(String eventType, String topic, String payload, TransactionMessage message) {
+    log.info("开始发送{}消息, message={}", eventType, payload);
     try {
-      Message message = Message.create(new Topic(topic), msg);
-
-      nsqTemplate.execute(producer -> producer.publish(message));
+      Message nsqMessage = Message.create(new Topic(topic), payload);
+      nsqTemplate.execute(producer -> producer.publish(nsqMessage));
 
       template.execute(status -> {
-        int rows = transactionMessageDao.updateState(messageDO.getId(), messageDO.getShardingId(),
+        int rows = transactionMessageDao.updateState(message.getId(), message.getShardingId(),
                                                      MessageStateEnum.PUBLISHED.getCode());
         return rows == 1;
       });
-      log.info("结束发送{}消息, message={}", eventType, msg);
+      log.info("结束发送{}消息, message={}", eventType, payload);
     } catch (NSQException e) {
-      log.error("发送{}消息失败, message={}", eventType, msg, e);
+      log.error("发送{}消息失败, message={}", eventType, payload, e);
     }
   }
 

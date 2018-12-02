@@ -30,13 +30,10 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
 
   private static final int MAX_DELETE_SIZE = 200;
 
-  private static final String BASE_COLUMNS =
-      "sharding_id, business_key, event_type, state, env, payload, topic";
-
-  private static final String ALL_COLUMNS = "id, created_at, updated_at, " + BASE_COLUMNS;
+  private static final String ALL_COLUMNS = "id, created_at, updated_at, sharding_id, business_key, event_type, state, env, payload, topic";
 
   private static final String INSERT_SQL_FORMAT =
-      "insert into %s (" + BASE_COLUMNS + ") values (?, ?, ?, ?, ?, ?, ?)";
+      "insert into %s (" + ALL_COLUMNS + ") values (null, now(), now(), ?, ?, ?, ?, ?, ?, ?)";
 
   private static final String UPDATE_STATE_SQL_FORMAT =
       "update %s set updated_at = now(), state=? where id=? and sharding_id=?";
@@ -96,9 +93,9 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
       return ps;
     }, keyHolder);
 
-    Object id = keyHolder.getKeys().get("id");
+    Number id = keyHolder.getKey();
     if (id != null) {
-      message.setId((Long) id);
+      message.setId(id.longValue());
     }
     return affectRows;
   }
