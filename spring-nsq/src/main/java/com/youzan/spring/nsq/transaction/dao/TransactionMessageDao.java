@@ -55,51 +55,55 @@ public interface TransactionMessageDao {
    * query send failed messages from non-sharding database
    *
    * @param from      the create time which is great or equal than (>=) from
+   * @param to        the create time which is less or equal than (<=) to
    * @param fetchSize the limit size
    * @return send failed messages.
    */
-  default List<TransactionMessage> queryPublishFailedMessagesOfNonSharding(Date from,
-                                                                           int fetchSize) {
-    return queryPublishFailedMessagesOfNonSharding(from, fetchSize, null);
+  default List<TransactionMessage> queryPublishFailedMessagesOfNonSharding(
+      Date from, Date to, int fetchSize) {
+    return queryPublishFailedMessagesOfNonSharding(from, to, fetchSize, null);
   }
 
   /**
    * query send failed messages from non-sharding database
    *
    * @param from      the create time which is great or equal than (>=) from
+   * @param to        the create time which is less or equal than (<=) to
    * @param fetchSize the limit size
    * @param env       the current environment
    * @return send failed messages.
    */
-  default List<TransactionMessage> queryPublishFailedMessagesOfNonSharding(Date from, int fetchSize,
-                                                                           String env) {
-    return queryPublishFailedMessages(from, fetchSize, env, 0);
+  default List<TransactionMessage> queryPublishFailedMessagesOfNonSharding(
+      Date from, Date to, int fetchSize, String env) {
+    return queryPublishFailedMessages(from, to, fetchSize, env, 0);
   }
 
   /**
    * query send failed messages from database
    *
    * @param from       the create time which is great or equal than (>=) from
+   * @param to         the create time which is less or equal than (<=) to
    * @param fetchSize  the limit size
    * @param shardingId the sharding id
    * @return send failed messages.
    */
-  default List<TransactionMessage> queryPublishFailedMessages(Date from, int fetchSize,
-                                                              int shardingId) {
-    return queryPublishFailedMessages(from, fetchSize, null, shardingId);
+  default List<TransactionMessage> queryPublishFailedMessages(
+      Date from, Date to, int fetchSize, int shardingId) {
+    return queryPublishFailedMessages(from, to, fetchSize, null, shardingId);
   }
 
   /**
    * query send failed messages from database
    *
    * @param from       the create time which is great or equal than (>=) from
+   * @param to         the create time which is less or equal than (<=) to
    * @param fetchSize  the limit size
    * @param env        the current environment
    * @param shardingId the sharding id
    * @return send failed messages.
    */
-  List<TransactionMessage> queryPublishFailedMessages(Date from, int fetchSize,
-                                                      String env, int shardingId);
+  List<TransactionMessage> queryPublishFailedMessages(
+      Date from, Date to, int fetchSize, String env, int shardingId);
 
   /**
    * batch delete messages (which are publishing success)

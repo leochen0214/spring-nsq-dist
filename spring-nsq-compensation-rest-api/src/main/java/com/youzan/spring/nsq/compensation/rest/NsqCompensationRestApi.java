@@ -49,8 +49,8 @@ public class NsqCompensationRestApi {
       @RequestParam(name = "size", required = false, defaultValue = "200") int size,
       @RequestParam(name = "shardingId", required = false, defaultValue = "0") int shardingId) {
     Date from = toDate(ZonedDateTime.now().minusDays(daysAgo));
-    TransactionMessageDao dao = transactionMessageService.getTransactionMessageDao();
-    List<TransactionMessage> messages = dao.queryPublishFailedMessages(from, size, shardingId);
+    List<TransactionMessage> messages =
+        transactionMessageService.queryPublishFailedMessages(from, shardingId, size);
     if (messages == null || messages.isEmpty()) {
       log.info("[事务性消息补偿任务]此次调度没有查询到{}天前需要重发的消息", daysAgo);
     } else {

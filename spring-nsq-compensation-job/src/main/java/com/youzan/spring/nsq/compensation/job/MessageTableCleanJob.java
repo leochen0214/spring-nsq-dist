@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class MessageTableCleanJob implements SimpleJob {
-  private static final String PREFIX = "[事务性消息清理任务]";
 
   @Resource
   private TransactionMessageDao transactionMessageDao;
@@ -41,7 +40,7 @@ public class MessageTableCleanJob implements SimpleJob {
 
     int rows = transactionMessageDao.batchDeleteOfNonSharding(date, fetchSize);
 
-    log.info("{} 清理{}天前数据, 本次清理共删除 {} 条记录", PREFIX, remainDays, rows);
+    log.info("[事务性消息清理任务]清理{}天前数据, 本次清理共删除 {} 条记录", remainDays, rows);
   }
 
 

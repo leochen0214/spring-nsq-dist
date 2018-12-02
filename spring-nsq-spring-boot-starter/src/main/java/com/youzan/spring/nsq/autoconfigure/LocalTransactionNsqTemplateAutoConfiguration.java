@@ -65,8 +65,10 @@ public class LocalTransactionNsqTemplateAutoConfiguration {
   @ConditionalOnMissingBean
   public TransactionMessageService transactionMessageService(
       @Autowired TransactionMessageDao transactionMessageDao,
-      @Autowired NsqTemplate nsqTemplate) {
-    return new DefaultTransactionMessageService(transactionMessageDao, nsqTemplate);
+      @Autowired NsqTemplate nsqTemplate,
+      @Autowired CurrentEnvironment currentEnvironment) {
+    return new DefaultTransactionMessageService(transactionMessageDao, nsqTemplate,
+                                                currentEnvironment);
   }
 
   @Bean

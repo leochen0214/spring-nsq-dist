@@ -3,12 +3,15 @@ package com.youzan.spring.nsq.transaction.service;
 import com.youzan.nsq.client.entity.Message;
 import com.youzan.nsq.client.entity.Topic;
 import com.youzan.spring.nsq.core.NsqOperations;
+import com.youzan.spring.nsq.transaction.CurrentEnvironment;
 import com.youzan.spring.nsq.transaction.dao.TransactionMessageDao;
 import com.youzan.spring.nsq.transaction.domain.MessageStateEnum;
 import com.youzan.spring.nsq.transaction.domain.TransactionMessage;
 
 import org.springframework.util.StringUtils;
 
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +25,35 @@ public class DefaultTransactionMessageService implements TransactionMessageServi
 
   private static final String PREFIX = "[事务性消息补偿任务]";
 
+  private static final int DEFAULT_SECONDS = 60;
+
   private final TransactionMessageDao transactionMessageDao;
   private final NsqOperations nsqTemplate;
+  private final CurrentEnvironment currentEnvironment;
+  private int seconds = DEFAULT_SECONDS;
+
 
   public DefaultTransactionMessageService(TransactionMessageDao transactionMessageDao,
-                                          NsqOperations nsqTemplate) {
+                                          NsqOperations nsqTemplate,
+                                          CurrentEnvironment currentEnvironment) {
     this.transactionMessageDao = transactionMessageDao;
     this.nsqTemplate = nsqTemplate;
+    this.currentEnvironment = currentEnvironment;
+  }
+
+  public void setSeconds(int seconds) {
+    this.seconds = seconds;
+  }
+
+  public int getSeconds() {
+    return seconds;
+  }
+
+  @Override
+  public List<TransactionMessage> queryPublishFailedMessages(Date from, int shardingId, int size) {
+    Date to = toDate(ZonedDateTime.now().minusSeconds(seconds));
+    String env = currentEnvironment.currentEnv();
+    return transactionMessageDao.queryPublishFailedMessages(from, to, size, env, shardingId);
   }
 
   @Override
@@ -88,6 +113,10 @@ public class DefaultTransactionMessageService implements TransactionMessageServi
       log.warn("{}此次更新消息表状态为已发送失败, message={}", PREFIX, message, e);
     }
     return false;
+  }
+
+  private static Date toDate(ZonedDateTime zdt) {
+    return Date.from(zdt.toInstant());
   }
 
 }

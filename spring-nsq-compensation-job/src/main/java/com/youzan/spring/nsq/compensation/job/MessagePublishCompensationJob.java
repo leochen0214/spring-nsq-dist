@@ -1,6 +1,5 @@
 package com.youzan.spring.nsq.compensation.job;
 
-import com.youzan.spring.nsq.transaction.CurrentEnvironment;
 import com.youzan.spring.nsq.transaction.domain.TransactionMessage;
 import com.youzan.spring.nsq.transaction.service.TransactionMessageService;
 
@@ -29,13 +28,10 @@ public class MessagePublishCompensationJob implements DataflowJob<TransactionMes
   private static final String PREFIX = "[事务性消息补偿任务]";
 
   @Resource
-  private CurrentEnvironment currentEnvironment;
-
-  @Resource
   private TransactionMessageService transactionMessageService;
 
   @Value("${spring.nsq.transaction.message.fetch-days: 7}")
-  private int agoDays;
+  private int daysAgo;
 
   @Value("${spring.nsq.transaction.message.fetch-size: 200}")
   private int fetchSize;
@@ -44,13 +40,12 @@ public class MessagePublishCompensationJob implements DataflowJob<TransactionMes
   @Override
   public List<TransactionMessage> fetchData(ShardingContext ctx) {
     log.debug("{}消息重发补偿job开始工作, ctx={}", PREFIX, ctx);
-    String env = currentEnvironment.currentEnv();
-    Date from = toDate(ZonedDateTime.now().minusDays(agoDays));
+    Date from = toDate(ZonedDateTime.now().minusDays(daysAgo));
 
-    List<TransactionMessage> messages = transactionMessageService.getTransactionMessageDao()
-        .queryPublishFailedMessagesOfNonSharding(from, fetchSize, env);
+    List<TransactionMessage> messages =
+        transactionMessageService.queryPublishFailedMessages(from, 0, fetchSize);
     if (messages.isEmpty()) {
-      log.info("{}此次调度没有查询到{}天前需要重发的消息", PREFIX, agoDays);
+      log.info("{}此次调度没有查询到{}天前需要重发的消息", PREFIX, daysAgo);
     }
     return messages;
   }

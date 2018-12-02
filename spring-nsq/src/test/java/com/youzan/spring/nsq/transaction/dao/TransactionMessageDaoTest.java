@@ -52,7 +52,6 @@ public class TransactionMessageDaoTest {
 
     jdbcTemplate = new JdbcTemplate(db);
     transactionMessageDao = new DefaultTransactionMessageDao(jdbcTemplate);
-    transactionMessageDao.setSecondsAgo(1);
   }
 
 
@@ -119,9 +118,10 @@ public class TransactionMessageDaoTest {
     populateData("/db-test-data.sql");
 
     Date oneDayAgo = Date.from(ZonedDateTime.now().minusDays(1).toInstant());
+    Date to = Date.from(ZonedDateTime.now().minusHours(1).toInstant());
 
     List<TransactionMessage> result =
-        transactionMessageDao.queryPublishFailedMessages(oneDayAgo, 10, "dev", 0);
+        transactionMessageDao.queryPublishFailedMessages(oneDayAgo, to, 10, "dev", 0);
 
     assertThat(result).isNotNull();
     assertThat(result.size()).isEqualTo(1);
@@ -132,9 +132,10 @@ public class TransactionMessageDaoTest {
     populateData("/db-test-data2.sql");
 
     Date oneDayAgo = Date.from(ZonedDateTime.now().minusDays(1).toInstant());
+    Date to = Date.from(ZonedDateTime.now().minusHours(1).toInstant());
 
     List<TransactionMessage> result =
-        transactionMessageDao.queryPublishFailedMessages(oneDayAgo, 10, 0);
+        transactionMessageDao.queryPublishFailedMessages(oneDayAgo,to, 10, 0);
 
     assertThat(result).isNotNull();
     assertThat(result.size()).isEqualTo(2);

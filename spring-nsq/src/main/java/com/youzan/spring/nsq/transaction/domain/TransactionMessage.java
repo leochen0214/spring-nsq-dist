@@ -14,7 +14,7 @@ public class TransactionMessage {
   /**
    * 主键id
    */
-  protected Long id;
+  private Long id;
 
   /**
    * 创建时间

@@ -31,8 +31,6 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
 
   private static final int MAX_DELETE_SIZE = 200;
 
-  private static final int DEFAULT_SECONDS_AGO = 30;
-
   private static final String ALL_COLUMNS =
       "id,created_at,updated_at,sharding_id,business_key,event_type,state,env,payload,topic";
 
@@ -67,26 +65,15 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
    */
   private String tableName = DEFAULT_TABLE_NAME;
 
-  /**
-   * seconds ago
-   */
-  private int secondsAgo = DEFAULT_SECONDS_AGO;
-
   public DefaultTransactionMessageDao(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
   }
-
 
   public void setTableName(String tableName) {
     if (StringUtils.hasText(tableName)) {
       this.tableName = tableName;
     }
   }
-
-  public void setSecondsAgo(int secondsAgo) {
-    this.secondsAgo = secondsAgo;
-  }
-
 
   @Override
   public int insert(TransactionMessage message) {
@@ -147,10 +134,9 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
   }
 
   @Override
-  public List<TransactionMessage> queryPublishFailedMessages(Date from, int fetchSize,
-                                                             String env, int shardingId) {
+  public List<TransactionMessage> queryPublishFailedMessages(
+      Date from, Date to, int fetchSize, String env, int shardingId) {
     int state = MessageStateEnum.CREATED.getCode();
-    Date to = Date.from(ZonedDateTime.now().minusSeconds(secondsAgo).toInstant());
     String sqlFormat;
     Object[] args;
     if (StringUtils.hasText(env)) {

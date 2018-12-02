@@ -2,12 +2,16 @@ package com.youzan.spring.nsq.transaction.builder;
 
 import com.youzan.spring.nsq.transaction.domain.TransactionMessage;
 
+import java.util.Date;
+
 /**
  * @author: clong
  * @date: 2018-09-12
  */
 public class TransactionMessageBuilder {
 
+  private Long id;
+  private Date createdAt;
   private String businessKey;
   private String eventType;
   private int shardingId;
@@ -25,8 +29,10 @@ public class TransactionMessageBuilder {
     return new TransactionMessageBuilder();
   }
 
-  public TransactionMessage build(){
+  public TransactionMessage build() {
     TransactionMessage result = new TransactionMessage();
+    result.setId(id);
+    result.setCreatedAt(createdAt);
     result.setShardingId(shardingId);
     result.setBusinessKey(businessKey);
     result.setEventType(eventType);
@@ -71,6 +77,16 @@ public class TransactionMessageBuilder {
 
   public TransactionMessageBuilder state(Integer state) {
     this.state = state;
+    return this;
+  }
+
+  public TransactionMessageBuilder id(Long id) {
+    this.id = id;
+    return this;
+  }
+
+  public TransactionMessageBuilder createdAt(Date createdAt) {
+    this.createdAt = createdAt;
     return this;
   }
 
