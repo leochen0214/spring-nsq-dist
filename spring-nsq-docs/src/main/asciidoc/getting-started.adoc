@@ -303,12 +303,12 @@ public interface NsqOperations {
 }
 ----
 
-=== 事务性消息发送与补偿任务
+== 事务性消息发送与补偿任务
 
 nsq 本身不支持发送事务性消息，现在由应用来保证消息一定会被发送出去，保证消息发送的可靠性。
 需要在业务应用库里新建一张本地消息事物表。表结构如下，表名称可自定义，默认表名: nsq_transaction_message
 
-==== table schema
+=== table schema
 
 [source,sql,indent=0]
 ----
@@ -330,7 +330,7 @@ create table nsq_transaction_message(
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 comment='本地消息事务表';
 ----
 
-==== TransactionNsqTemplate API
+=== TransactionNsqTemplate API
 
 应用使用 `TransactionNsqTemplate` 发送事务性消息
 
@@ -348,9 +348,9 @@ public interface TransactionNsqTemplate {
 }
 ----
 
-==== application usage
+=== application usage
 
-===== spring boot application add maven dependency
+==== spring boot application add maven dependency
 
 [source,xml,indent=0,subs="verbatim,quotes,attributes"]
 ----
@@ -360,7 +360,7 @@ public interface TransactionNsqTemplate {
 </dependency>
 ----
 
-===== non spring-boot application add maven-dependency
+==== non spring-boot application add maven-dependency
 
 [source,xml,indent=0,subs="verbatim,quotes,attributes"]
 ----
@@ -412,7 +412,7 @@ public class TransactionNsqTemplateConfiguration {
 }
 ----
 
-===== 使用示例
+==== 使用示例
 
 使用 `MessageContextBuilder` 来build `MessageContext`。需要在开启事物的方法中调用transactionNsqTemplate.send() 方法
 否则，会抛出 IllegalStateException("当前线程上无绑定事物，请确保在开启了事物中的方法中调用此方法")。
@@ -467,7 +467,7 @@ public class PaymentListener {
 }
 ----
 
-==== MessageContext 字段说明
+=== MessageContext 字段说明
 
 [width="90%"]
 |===
@@ -481,23 +481,69 @@ public class PaymentListener {
 
 |===
 
-==== 配置表名称 application.properties
+=== 配置表名称 application.properties
 
 [source,properties,indent=0,subs="verbatim,attributes,macros"]
 ----
 spring.nsq.transaction.message.table-name=pay_tc_message
 ----
 
-==== 补偿job和清理job
+=== 补偿job和清理job
 
-`NsqCompensationJobConfiguration` 是针对非分库分表应用的补偿job和清理job的配置类。
+补偿任务: 重发发送失败的消息。
+清理任务: 删除发送成功的消息，只保留一定天数的数据。
+
+spring-nsq提供了elastic job和rest api 2种实现。
+
+使用elastic job 直接依赖 `spring-nsq-compensation-job`, 使用 rest api 依赖 `spring-nsq-compensation-rest-api`
+
+==== 基于rest api的任务配置(通过watchman配置http调用)
 
 * 添加补偿job依赖
 
 [source,xml,indent=0,subs="verbatim,quotes,attributes"]
 ----
 <dependency>
-    <groupId>com.youzan.spring.nsq</groupId>
+    <groupId>com.youzan.spring.nsq</groupId
+    <artifactId>spring-nsq-compensation-rest-api</artifactId>
+</dependency>
+----
+
+* 应用引入job配置类
+
+[source,java,indent=0]
+----
+@SpringBootApplication
+@Import(NsqCompensationRestApiConfiguration.class)
+public class JobApplication {
+  public static void main(String[] args) {
+    YouZanBootApplication.run(JobApplication.class, args);
+  }
+}
+----
+
+===== 重发消息补偿任务
+重发7天前发送失败的消息(分片0上,非分库分表应用，不用指定shardingId参数)
+
+```
+curl -s "http://pay-assetcenter.s.qima-inc.com/nsq/compensation/api/publishAgain?daysAgo=7&size=200&shardingId=0"
+```
+
+===== 清理已发送成功的消息任务
+删除30天前已发送成功的消息记录(分片0上,非分库分表应用，不用指定shardingId参数)
+
+```
+curl -s "http://pay-assetcenter.s.qima-inc.com/nsq/compensation/api/delete?remainDays=30&size=200&shardingId=0"
+```
+
+==== 基于elastic job的任务配置
+
+* 添加补偿job依赖
+
+[source,xml,indent=0,subs="verbatim,quotes,attributes"]
+----
+<dependency>
+    <groupId>com.youzan.spring.nsq</groupId
     <artifactId>spring-nsq-compensation-job</artifactId>
 </dependency>
 ----
