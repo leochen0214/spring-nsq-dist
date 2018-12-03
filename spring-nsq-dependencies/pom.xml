@@ -3,7 +3,7 @@
     <parent>
         <artifactId>spring-nsq-dist</artifactId>
         <groupId>com.youzan.spring.nsq</groupId>
-        <version>1.0.7</version>
+        <version>1.0.8-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -29,7 +29,7 @@
         <nsq-client.version>2.4.2.2-RELEASE</nsq-client.version>
         <fastjson.version>1.2.49</fastjson.version>
         <job-client.version>1.0.5.RELEASE</job-client.version>
-        <spring-nsq-dependencies.version>1.0.7</spring-nsq-dependencies.version>
+        <spring-nsq-dependencies.version>1.0.8-SNAPSHOT</spring-nsq-dependencies.version>
     </properties>
 
     <dependencyManagement>
