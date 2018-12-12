@@ -251,6 +251,13 @@ dts发送的消息，会在原有POJO对象上包装一层, headers 和 bizBody�
    }
 ----
 
+=== NsqNotRequeueException & NsqRequeueException
+当消费者处理程序抛出 `com.youzan.spring.nsq.exception.NsqNotRequeueException` 异常时，nsq broker server将不会
+再次投递该消息。
+
+实际上，当消费者处理程序抛出任何异常时，nsq broker server将会再次投递该条消息，
+spring-nsq提供消息再次投递专有异常类(com.youzan.spring.nsq.exception.NsqRequeueException)，加强程序语义。
+
 
 === Producer
 
@@ -322,10 +329,10 @@ create table nsq_transaction_message(
   `state` smallint(5) unsigned not null default 0 comment '消息投递状态, 0-CREATED, 1-PUBLISHED',
   `env` varchar(16) not null default '' comment '当前环境',
   `topic` varchar(256) not null default '' comment '消息topic',
-  `payload` varchar(2048) not null default '' comment '消息体',
+  `payload` varchar(4096) not null default '' comment '消息体',
 
   primary key (`id`),
-  unique key uniq_tb(`event_type`, `business_key`),
+  unique key uniq_tb(`business_key`, `event_type`),
   key idx_sc (`state`, `created_at`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 comment='本地消息事务表';
 ----
