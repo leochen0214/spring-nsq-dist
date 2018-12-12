@@ -251,12 +251,12 @@ dts发送的消息，会在原有POJO对象上包装一层, headers 和 bizBody�
    }
 ----
 
-=== NsqNotRequeueException & NsqRequeueException
+==== NsqNotRequeueException & NsqRequeueException
 当消费者处理程序抛出 `com.youzan.spring.nsq.exception.NsqNotRequeueException` 异常时，nsq broker server将不会
 再次投递该消息。
 
 实际上，当消费者处理程序抛出任何异常时，nsq broker server将会再次投递该条消息，
-spring-nsq提供消息再次投递专有异常类(com.youzan.spring.nsq.exception.NsqRequeueException)，加强程序语义。
+spring-nsq提供消息再次投递专有异常类(`com.youzan.spring.nsq.exception.NsqRequeueException`)，加强程序语义。
 
 
 === Producer
