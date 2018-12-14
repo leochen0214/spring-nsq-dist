@@ -11,7 +11,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.util.StringUtils;
 
 import java.sql.PreparedStatement;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +28,7 @@ public class DefaultTransactionMessageDao implements TransactionMessageDao {
 
   private static final String ZAN_TEST_RDS_TAG = "/*!ctx:shadow*/";
 
-  private static final int MAX_DELETE_SIZE = 200;
+  private static final int MAX_DELETE_SIZE = 500;
 
   private static final String ALL_COLUMNS =
       "id,created_at,updated_at,sharding_id,business_key,event_type,state,env,payload,topic";
