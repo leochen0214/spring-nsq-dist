@@ -25,7 +25,7 @@ public class DefaultTransactionMessageService implements TransactionMessageServi
 
   private static final String PREFIX = "[事务性消息补偿任务]";
 
-  private static final int DEFAULT_SECONDS = 30;
+  private static final int DEFAULT_SECONDS = 60;
 
   private final TransactionMessageDao transactionMessageDao;
   private final NsqOperations nsqTemplate;
