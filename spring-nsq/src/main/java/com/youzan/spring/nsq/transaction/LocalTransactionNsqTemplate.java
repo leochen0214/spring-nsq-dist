@@ -51,7 +51,7 @@ public class LocalTransactionNsqTemplate implements TransactionNsqTemplate {
   @Override
   public void send(String topic, MessageContext context) {
     if (!TransactionSynchronizationManager.isActualTransactionActive()) {
-      throw new IllegalStateException("当前线程上无绑定事物，请确保在开启了事物中的方法中调用此方法");
+      throw new IllegalStateException("当前线程上无绑定事务，请确保在开启了事务中的方法中调用此方法");
     }
 
     String payload = getPayload(context);
