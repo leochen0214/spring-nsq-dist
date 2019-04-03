@@ -64,14 +64,7 @@ public class LocalTransactionNsqTemplate implements TransactionNsqTemplate {
         .topic(topic)
         .state(MessageStateEnum.CREATED.getCode())
         .build();
-
-    boolean success = false;
-    try {
-      success = insert(message);
-    } catch (DuplicateKeyException e) {
-      log.warn("重复消息，不入库", e);
-    }
-
+    boolean success = insert(message);
     if (success) {
       TransactionSynchronizationManager
           .registerSynchronization(new TransactionSynchronizationAdapter() {
@@ -86,7 +79,12 @@ public class LocalTransactionNsqTemplate implements TransactionNsqTemplate {
 
   private Boolean insert(TransactionMessage message) {
     return template.execute(status -> {
-      int rows = transactionMessageDao.insert(message);
+      int rows = 0;
+      try {
+        rows = transactionMessageDao.insert(message);
+      } catch (DuplicateKeyException e) {
+        log.warn("重复消息，不入库", e);
+      }
       return rows == 1;
     });
   }
